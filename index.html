@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>张荣庭 | 南京工业大学测绘科学与技术学院</title>
+  <meta name="description" content="张荣庭（Rongting Zhang），南京工业大学测绘科学与技术学院，研究方向：城市三维场景理解、三维网格语义分割、点云配准。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- ============ 导航栏 ============ -->
+  <nav class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <a class="brand" href="#top">张荣庭 <span class="brand-en">Rongting Zhang</span></a>
+      <button class="nav-toggle" id="navToggle" aria-label="菜单">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#about">个人简介</a></li>
+        <li><a href="#research">研究方向</a></li>
+        <li><a href="#publications">发表论文</a></li>
+        <li><a href="#contact">联系方式</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ============ 页头（个人名片） ============ -->
+  <header class="hero" id="top">
+    <div class="container hero-inner">
+      <!-- 照片：把照片放到 assets/img/avatar.jpg 即可显示；未放置时显示首字母头像 -->
+      <div class="avatar">
+        <img src="assets/img/avatar.jpg" alt="张荣庭" onerror="this.style.display='none';document.getElementById('avatarFallback').style.display='flex';">
+        <div class="avatar-fallback" id="avatarFallback">张</div>
+      </div>
+      <div class="hero-text">
+        <h1>张荣庭 <span class="hero-en">Rongting Zhang</span></h1>
+        <!-- TODO: 职称确认后替换，例如改为「副教授 / Associate Professor」 -->
+        <p class="title-line">南京工业大学 测绘科学与技术学院</p>
+        <p class="title-line-en">School of Geodesy and Geomatics, Nanjing Tech University</p>
+        <p class="tagline">城市三维场景理解 · 三维网格语义分割 · 点云配准</p>
+        <div class="hero-links">
+          <a class="btn" href="https://cge.njtech.edu.cn/info/1045/4427.htm" target="_blank" rel="noopener">学院主页</a>
+          <a class="btn btn-outline" href="https://scholar.google.com.hk/citations?user=4arxHdYAAAAJ&hl=zh-CN&oi=ao" target="_blank" rel="noopener">Google Scholar</a>
+          <a class="btn btn-outline" href="https://orcid.org/0000-0002-2420-2438" target="_blank" rel="noopener">ORCID</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ============ 个人简介 ============ -->
+    <section id="about" class="section">
+      <h2 class="section-title">个人简介 <span class="en">About</span></h2>
+      <div class="card">
+        <p>
+          张荣庭，博士，南京工业大学测绘科学与技术学院教师，长期从事
+          <strong>三维地理信息与人工智能交叉方向</strong>的研究工作。
+          主要围绕城市实景三维模型（倾斜摄影网格、点云）的
+          <strong>智能化理解与解译</strong>开展研究，
+          包括三维网格语义分割、点云配准、大规模三维场景结构化建模等，
+          成果服务于智慧城市、实景三维中国建设等应用需求。
+        </p>
+        <!-- TODO: 教育背景、工作经历确认后在此补充，例如：
+        <h3>教育经历</h3>
+        <ul>
+          <li>20XX–20XX  XX大学  测绘科学与技术  博士</li>
+          <li>20XX–20XX  XX大学  测绘工程  硕士</li>
+        </ul>
+        <h3>工作经历</h3>
+        <ul>
+          <li>20XX–至今  南京工业大学 测绘科学与技术学院  教师</li>
+        </ul>
+        -->
+        <h3>学术链接</h3>
+        <ul class="link-list">
+          <li>Google Scholar：<a href="https://scholar.google.com.hk/citations?user=4arxHdYAAAAJ&hl=zh-CN&oi=ao" target="_blank" rel="noopener">scholar.google.com/citations?user=4arxHdYAAAAJ</a></li>
+          <li>学院个人主页：<a href="https://cge.njtech.edu.cn/info/1045/4427.htm" target="_blank" rel="noopener">cge.njtech.edu.cn/info/1045/4427.htm</a></li>
+          <li>ORCID：<a href="https://orcid.org/0000-0002-2420-2438" target="_blank" rel="noopener">0000-0002-2420-2438</a></li>
+          <li>IEEE Author：<a href="https://ieeexplore.ieee.org/author/37085409556" target="_blank" rel="noopener">ieeexplore.ieee.org/author/37085409556</a></li>
+          <li>dblp：<a href="https://dblp.uni-trier.de/pid/153/8792.html" target="_blank" rel="noopener">dblp.org/pid/153/8792</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ 研究方向 ============ -->
+    <section id="research" class="section">
+      <h2 class="section-title">研究方向 <span class="en">Research Interests</span></h2>
+      <div class="grid">
+        <div class="card">
+          <h3>🏙️ 城市三维场景语义分割</h3>
+          <p>面向大规模城市场景三维网格与点云数据，研究基于深度学习的语义分割与场景理解方法，实现对建筑、道路、植被等要素的自动识别与解译。</p>
+        </div>
+        <div class="card">
+          <h3>🧩 三维网格智能解译</h3>
+          <p>针对倾斜摄影测量生成的高精度纹理网格模型，研究高效、稳健的几何—纹理联合特征提取与结构化建模方法。</p>
+        </div>
+        <div class="card">
+          <h3>🔗 点云配准与融合</h3>
+          <p>研究大规模点云的高精度配准算法（基于图结构、空间一致性约束等），服务于多源三维数据的融合与更新。</p>
+        </div>
+        <div class="card">
+          <h3>🤖 测绘与人工智能交叉</h3>
+          <p>将深度学习、图神经网络等人工智能技术应用于摄影测量、遥感与三维地理信息领域，推动测绘地理信息智能化发展。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 发表论文 ============ -->
+    <section id="publications" class="section">
+      <h2 class="section-title">发表论文 <span class="en">Selected Publications</span></h2>
+      <!-- TODO: 请对照 Google Scholar 核对作者顺序与补充最新论文；带 * 的条目作者列表待核对 -->
+      <div class="card">
+        <h3>2025</h3>
+        <ul class="pub-list">
+          <li>
+            <div class="pub-title">MFSM-Net: Multimodal Feature Fusion for the Semantic Segmentation of Urban-Scale Textured 3D Meshes</div>
+            <div class="pub-meta"><em>Remote Sensing</em>, 2025, 17(15): 1573 · 张荣庭等</div>
+            <div class="pub-links">
+              <a href="https://www.mdpi.com/2072-4292/17/15/1573" target="_blank" rel="noopener">MDPI 全文</a>
+            </div>
+          </li>
+          <li>
+            <div class="pub-title">复杂城市场景三维网格模型智能解译技术综述</div>
+            <div class="pub-meta">中国图象图形学报, 2025, 30(6): 1808–1827 · 张荣庭等</div>
+            <div class="pub-links">
+              <a href="https://www.cjig.cn" target="_blank" rel="noopener">期刊官网</a>
+            </div>
+          </li>
+        </ul>
+
+        <h3>2023</h3>
+        <ul class="pub-list">
+          <li>
+            <div class="pub-title">Mesh-Based DGCNN: Semantic Segmentation of Textured 3-D Urban Scenes</div>
+            <div class="pub-meta"><em>IEEE Transactions on Geoscience and Remote Sensing</em> (TGRS), 2023, 61: 1–13 · Rongting Zhang, Guangyun Zhang, et al.</div>
+            <div class="pub-links">
+              <a href="https://ieeexplore.ieee.org/document/10102456" target="_blank" rel="noopener">IEEE Xplore</a>
+              <a href="https://dblp.org/rec/journals/tgrs/ZhangZYJM23.html" target="_blank" rel="noopener">dblp</a>
+            </div>
+          </li>
+          <li>
+            <div class="pub-title">MeshNet-SP: A Semantic Urban 3D Mesh Segmentation Network with Sparse Prior</div>
+            <div class="pub-meta"><em>Remote Sensing</em>, 2023, 15(22): 5324 · Rongting Zhang, et al.</div>
+            <div class="pub-links">
+              <a href="https://www.mdpi.com/2072-4292/15/22/5324" target="_blank" rel="noopener">MDPI 全文</a>
+              <a href="https://doi.org/10.3390/rs15225324" target="_blank" rel="noopener">DOI</a>
+            </div>
+          </li>
+          <li>
+            <div class="pub-title">Grid Graph-Based Large-Scale Point Clouds Registration</div>
+            <div class="pub-meta"><em>International Journal of Digital Earth</em>, 2023 · Guangyun Zhang, Rongting Zhang, et al.</div>
+            <div class="pub-links">
+              <a href="https://www.tandfonline.com/doi/10.1080/17538947.2023.2228298" target="_blank" rel="noopener">全文（开放获取）</a>
+            </div>
+          </li>
+          <li>
+            <div class="pub-title">A Spatial Consistency-Based Point Cloud Registration Method for the Same Platform</div>
+            <div class="pub-meta">测绘学报（Acta Geodaetica et Cartographica Sinica）, 2023 · 张荣庭等</div>
+            <div class="pub-links">
+              <a href="http://xb.chinasmp.com/EN/10.11947/j.AGCS.2023.20220262" target="_blank" rel="noopener">期刊页面</a>
+            </div>
+          </li>
+          <li>
+            <div class="pub-title">复杂城市动态图卷积网络三维场景语义分割法</div>
+            <div class="pub-meta">测绘学报, 2023 · 张荣庭等</div>
+            <div class="pub-links">
+              <a href="http://xb.chinasmp.com/EN/abstract/abstract13131.shtml" target="_blank" rel="noopener">期刊页面</a>
+            </div>
+          </li>
+        </ul>
+        <p class="note">完整论文列表与引用统计请访问我的 <a href="https://scholar.google.com.hk/citations?user=4arxHdYAAAAJ&hl=zh-CN&oi=ao" target="_blank" rel="noopener">Google Scholar 主页</a>。</p>
+      </div>
+    </section>
+
+    <!-- ============ 联系方式 ============ -->
+    <section id="contact" class="section">
+      <h2 class="section-title">联系方式 <span class="en">Contact</span></h2>
+      <div class="card">
+        <ul class="contact-list">
+          <!-- TODO: 确认后填写邮箱，例如：
+          <li>📧 邮箱：<a href="mailto:xxx@njtech.edu.cn">xxx@njtech.edu.cn</a></li>
+          -->
+          <li>🏫 单位：南京工业大学 测绘科学与技术学院</li>
+          <li>📍 地址：江苏省南京市江北新区浦珠南路 30 号（邮编 211816）</li>
+          <li>📄 学院主页：<a href="https://cge.njtech.edu.cn/info/1045/4427.htm" target="_blank" rel="noopener">cge.njtech.edu.cn/info/1045/4427.htm</a></li>
+          <li>🎓 Google Scholar：<a href="https://scholar.google.com.hk/citations?user=4arxHdYAAAAJ&hl=zh-CN&oi=ao" target="_blank" rel="noopener">访问学者主页</a></li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© <span id="year"></span> 张荣庭 (Rongting Zhang) · 南京工业大学测绘科学与技术学院</p>
+      <p class="footer-note">本主页由 GitHub Pages 托管 · <a href="https://github.com/NJTechZhang" target="_blank" rel="noopener">github.com/NJTechZhang</a></p>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
