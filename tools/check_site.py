@@ -73,15 +73,22 @@ def check_pages():
 
 def check_home():
     home = open(os.path.join(ROOT, "index.html"), encoding="utf-8").read()
-    items = re.findall(r'<div class="pub-title"><a href="(papers/[^"]+)">', home)
-    print(f"主页论文条目：{len(items)} 条")
-    miss = [s for s in items if not os.path.exists(os.path.join(ROOT, s))]
+    # 主页上每篇论文的「中文导读」按钮
+    buttons = re.findall(r'<a class="tag-link" href="(papers/[^"]+)">', home)
+    print(f"主页中文导读按钮：{len(buttons)} 个")
+    miss = [s for s in buttons if not os.path.exists(os.path.join(ROOT, s))]
+    print(f"  按钮指向的页面缺失：{len(miss)} 个" + (f" -> {miss}" if miss else ""))
+
+    # 标题不应再是导读入口（入口只保留按钮）
+    linked_titles = len(re.findall(r'<div class="pub-title"><a href="papers/', home))
+    print(f"  标题仍带导读链接：{linked_titles} 处（应为 0）")
+
     pages = {f"papers/{f}" for f in os.listdir(os.path.join(ROOT, "papers"))
              if f.endswith(".html") and f != "index.html"}
-    orphan = sorted(pages - set(items))
-    print(f"  缺失页面：{len(miss)} 个" + (f" -> {miss}" if miss else ""))
-    print(f"  未登记页面：{len(orphan)} 个" + (f" -> {orphan}" if orphan else ""))
-    return len(miss) + len(orphan)
+    # papers/index.html 为独立的「按年份总览」页，主页有意不放入口，不计为孤立页面
+    orphan = sorted(pages - set(buttons))
+    print(f"  无按钮指向的导读页：{len(orphan)} 个" + (f" -> {orphan}" if orphan else ""))
+    return len(miss) + len(orphan) + linked_titles
 
 
 if __name__ == "__main__":
