@@ -24,7 +24,8 @@
 │   └── img/avatar.jpg          # 个人照片（可选，未放置时显示"张"字头像）
 ├── tools/                      # 维护工具（Python，需 PyMuPDF）
 │   ├── build_digest.py         # 从 PDF 批量提取全文与内容摘要素材
-│   └── check_site.py           # 站点自检：链接、结构、条目一致性
+│   ├── check_site.py           # 站点自检：链接、结构、条目一致性
+│   └── factcheck_pages.py      # 事实核查：把导读页数值与原文 PDF 比对
 ├── 论文原文/                    # 论文 PDF 原文（已在 .gitignore 中排除，不会上线）
 ├── .gitignore                  # 排除 PDF 原文与临时文件
 ├── .nojekyll                   # 声明纯静态站点
@@ -37,11 +38,14 @@
 # 站点自检（提交前建议运行）：检查内部链接、页面结构、论文条目是否一致
 python tools/check_site.py
 
+# 事实核查：把每篇导读页中的数值与对应论文 PDF 全文比对，标记查无实据的数字
+python tools/factcheck_pages.py
+
 # 新增论文时：从 论文原文/*.pdf 批量提取全文与摘要素材到 .tmp_extract/
 python tools/build_digest.py
 ```
 
-两个脚本均需 `pip install pymupdf`。
+三个脚本均需 `pip install pymupdf`。新增论文后请在 `tools/factcheck_pages.py` 的 `MAP` 字典中登记「导读页 → PDF 文件名」映射。
 
 ## 一之二、论文中文导读
 
