@@ -121,6 +121,18 @@ a:hover { text-decoration: underline; }
 
 .link-list li, .contact-list li { margin-bottom: 6px; }
 
+/* 基本信息列表 */
+.info-list {
+  list-style: none;
+  margin: 16px 0 0 0 !important;
+  padding: 14px 18px;
+  background: #f4f8fc;
+  border-left: 4px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+}
+.info-list li { margin-bottom: 4px; font-size: 0.94rem; }
+.info-list b { color: var(--primary-dark); }
+
 /* ---------- 研究方向网格 ---------- */
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
