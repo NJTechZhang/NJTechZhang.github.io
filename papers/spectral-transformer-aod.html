@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>融合物理约束正则化的光谱 Transformer 高分辨率 Landsat-8 气溶胶光学厚度反演 | 论文导读 - 张荣庭</title>
+  <meta name="description" content="以课程掩膜自监督预训练与可微物理约束正则化，实现 30 m 分辨率、光谱一致的 Landsat-8 气溶胶光学厚度反演。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+  <link rel="stylesheet" href="../assets/css/paper.css">
+</head>
+<body>
+
+  <nav class="topbar">
+    <div class="wrap">
+      <a class="back" href="../index.html">← 返回主页</a>
+      <span class="crumb">论文导读 · 2026</span>
+    </div>
+  </nav>
+
+  <article class="paper">
+    <div class="wrap">
+      <span class="kicker">期刊论文 · 大气遥感与物理约束深度学习</span>
+      <h1>融合物理约束正则化的光谱 Transformer 高分辨率 Landsat-8 气溶胶光学厚度反演</h1>
+      <p class="orig-title">Spectral transformer with physics-informed regularization for high-resolution Landsat-8 AOD retrieval</p>
+
+      <ul class="meta">
+        <li><b>作者：</b>Xinlin Xu, Guangyun Zhang*, <span class="hl">张荣庭</span> (Rongting Zhang), Guoqing Zhou</li>
+        <li><b>发表：</b>Journal of Quantitative Spectroscopy and Radiative Transfer（定量光谱学与辐射传输杂志）, 2026, 364: 110084</li>
+        <li><b>类型：</b>SCI 期刊论文</li>
+        <li><b>DOI：</b><a href="https://doi.org/10.1016/j.jqsrt.2026.110084" target="_blank" rel="noopener">10.1016/j.jqsrt.2026.110084</a></li>
+      </ul>
+
+      <section>
+        <h2>摘要</h2>
+        <p>高分辨率（≤30 m）气溶胶光学厚度（AOD）反演对城市空气质量监测与大气校正十分重要，但受三重因素制约：AERONET 站点稀疏使监督样本有限；纯数据驱动模型会产生光谱上不合理的输出；物理方法与机器学习方法都难以在不同地表—大气条件下泛化。本文提出三阶段框架 SpecT：以课程掩膜自编码在约 17 万个无标签 Landsat 天顶（TOA）光谱样本上自监督预训练；以物理约束正则化改善光谱一致性；以差分学习率的渐进式微调平衡精度与物理合理性。在 247 个全球 AERONET 站点、10 260 个样本上五折交叉验证得到 R²=0.8479±0.0114、光谱角 SAM=5.15°±0.11°；物理项权重为 0 时 SAM 为 6.08°，仅去掉第 3 阶段物理约束时为 5.99°。消融试验表明预训练提升标签效率、物理约束改善光谱一致性，该框架可支撑 Landsat 影像的 30 m AOD 制图。</p>
+      </section>
+
+      <section>
+        <h2>研究背景与动机</h2>
+        <p>气溶胶是悬浮在大气中的固态或液态颗粒物，尺度从纳米级到微米级，来源既包括沙尘暴、火山喷发等自然过程，也包括化石燃料燃烧、生物质燃烧与工业活动等人为排放。气溶胶通过散射和吸收太阳辐射（直接效应）以及改变云的微物理性质（间接效应）影响地球辐射收支，是气候系统辐射强迫不确定性的主要来源之一。IPCC 第六次评估报告估计，气溶胶—辐射相互作用的有效辐射强迫为 −0.3±0.3 W/m²，气溶胶—云相互作用为 −1.0±0.7 W/m²，不确定度范围明显偏大。</p>
+        <p>AOD 是描述气溶胶柱含量的关键参数，卫星遥感是大范围获取 AOD 的主要手段，但高分辨率反演仍然困难：地基 AERONET 站点全球分布稀疏，可用的标签样本有限；纯数据驱动模型虽能取得较高的点估计精度，却可能给出光谱上不合理的反演结果；基于物理的辐射传输反演计算代价高，难以适应多样的地表—大气条件。此外，多源异构输入还带来"捷径学习"风险：当温度、水汽等气象辅助变量始终可见时，模型可能直接用它们填补被掩膜的谱段，而不去学习谱段之间真实的辐射传输关系。因此，如何在标签稀缺条件下同时获得准确的 AOD 估计与符合物理规律的光谱一致性，是本文要解决的核心问题。</p>
+      </section>
+
+      <section>
+        <h2>方法与主要创新</h2>
+        <ul>
+          <li><b>光谱令牌 Transformer（SpecT）回归框架。</b>将多源输入组织为 10 个语义令牌：8 个 TOA 波段令牌（每个谱段一个）、1 个几何令牌（太阳天顶角、太阳方位角、散射角）和 1 个辅助令牌（地形高程、NDVI、MNDWI、云量及 ERA5 气象变量）。各类型令牌经独立线性层投影到共享嵌入空间，并配可学习位置编码以保留序列顺序与语义区分。编码器采用 ViT 主干（嵌入维 384、深度 12 个 Transformer 块、6 个注意力头、MLP 比例 4.0），解码器轻量化（嵌入维 192、深度 4、3 个注意力头）；多头自注意力直接建模跨令牌的非局域谱段依赖。</li>
+          <li><b>课程式掩膜自监督预训练。</b>预训练目标为掩膜令牌上的重构均方误差 L<sub>recon</sub>。为抑制捷径学习，掩膜策略分四个阶段：预热（0–10 轮，辅助令牌掩膜概率 p<sub>aux</sub>=0.1）；困难（11–65 轮，p<sub>aux</sub> 由 0.1 提高到 0.5，TOA 波段块掩膜率 p<sub>TOA</sub> 由 0.3 提高到 0.6，迫使编码器学习谱段间非线性依赖）；过渡（66–90 轮，p<sub>aux</sub> 退火至 0.0，p<sub>TOA</sub> 保持 0.3 以对齐推理分布）；最终（91–100 轮固定为 p<sub>aux</sub>=0.0、p<sub>TOA</sub>=0.3）。</li>
+          <li><b>物理约束正则化。</b>总损失为 L<sub>total</sub>=L<sub>sup</sub>+λ<sub>physics</sub>·L<sub>physics</sub>，其中 L<sub>physics</sub>=w<sub>rte</sub>·L<sub>RTE</sub>+w<sub>ang</sub>·L<sub>Ångström</sub>+w<sub>mono</sub>·L<sub>monotonicity</sub>。L<sub>RTE</sub> 用单次散射近似与 Henyey–Greenstein 相函数（不对称因子 g=0.7）搭建完全可微的正演模块，把预测的多波段 AOD 正向重构为 TOA 反射率并与观测比较（ρ<sub>TOA</sub>=ρ<sub>atm</sub>(τ)+ρ<sub>surf</sub>T(τ)²/(1−ρ<sub>surf</sub>S(τ))，地表反射率取 MODIS MCD19A2 C6 MAIAC 产品）；L<sub>Ångström</sub> 依据 τ(λ)=β·λ<sup>−α</sup> 惩罚偏离幂律平滑光谱的成分；L<sub>mono</sub> 用 ReLU 惩罚 AOD 随波长非物理上升。训练取 λ<sub>physics</sub>=0.01、w<sub>rte</sub>=1.0、w<sub>ang</sub>=0.5、w<sub>mono</sub>=0.3。</li>
+          <li><b>三阶段渐进式微调与差分学习率。</b>第 2 阶段加入 AERONET 监督与物理惩罚，冻结编码器下半部分（第 0–5 层）以保护预训练得到的低层光谱特征，仅训练上层与预测头；第 3 阶段对未冻结编码器层用较低学习率（5×10⁻⁵）、对 AOD 预测头用较高学习率（1×10⁻⁴），兼顾任务适配与表征保持，并配合余弦退火与梯度裁剪（阈值 1.0）。</li>
+          <li><b>折间不确定性估计。</b>通过 k 折交叉训练，以各折平均预测作为最终估计、以折间标准差作为不确定性代理，降低单模型方差并给出近似置信区间。</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>实验与结果</h2>
+        <p><b>数据与设置。</b>输入为 Landsat-8 Collection-2 Tier-1 TOA 反射率（30 m），真值为 AERONET L2.0 地基观测，共 247 个全球站点、10 260 个匹配样本；自监督预训练池含 171 398 个无标签样本。辅助数据包括 MODIS MCD19A2 C6 地表反射率与 ERA5 再分析场。</p>
+        <p><b>总体精度。</b>采用五折交叉验证（每折约 8 208 个训练、2 052 个测试样本），指标为 Pearson r、R²、RMSE、MAE、偏差与光谱角 SAM。完整 SpecT 的结果为 R²=0.8479±0.0114、RMSE=0.0706±0.0033、MAE=0.040±0.002、Pearson r=0.921、平均 SAM=5.15°±0.11°（中位数 3.94°），81.3% 的样本落在期望误差范围内。</p>
+        <p><b>对比与消融。</b>统一数据与协议下，从零训练的 Transformer 基线 R²=0.6289，加入光谱自监督预训练后升至 0.7643，再加线性退火物理约束升至 0.7818，置信区间不重叠（p&lt;0.05）。物理项权重 λ<sub>physics</sub>=0 时 SAM=6.08°、R²=0.5482；λ<sub>physics</sub>=0.01 时光谱一致性明显改善；λ<sub>physics</sub>≥0.1 则因约束过强导致欠拟合（0.5 时 R² 仅 0.2271）。标签效率方面，1% 标签下预训练把 R² 由 0.041 提升到 0.127（+210%），全量标签下由 0.496 提升到 0.659（+33%）。空间泛化方面，随机站点划分下 R² 仅下降约 2%，留一站验证（LOSO）中 220 个可评估站点有 203 个（92.3%）R² 为正。Ångström 指数预测上完整流程 r=0.591，去掉第 3 阶段物理约束后降至 0.438。</p>
+      </section>
+
+      <section>
+        <h2>结论与意义</h2>
+        <p>本文面向 30 m Landsat AOD 反演提出三阶段 SpecT 框架，主要结论有三：其一，对 171 398 个无标签 TOA 样本的自监督预训练显著提升标签效率，1% 标签条件下 R² 相对提升约 210%；其二，物理约束正则化改善光谱一致性，去掉第 3 阶段物理约束后平均 SAM 由 5.10° 升至 5.96°；其三，模型可泛化到未见站点，留一站验证中 92.3% 的站点 R² 为正。该方法适用于城市尺度高分辨率气溶胶监测、大气校正所需的 AOD 先验以及 Landsat-8/9 同谱段配置下的跨传感器迁移。局限与后续方向包括：正演模块采用单次散射等简化，未来可引入 6SV 等更完整的模型；亮地表与低气溶胶载荷下地表反射率不确定性会传播至 AOD；偏远海岛、高海拔与极端地表站点仍需区域微调或域自适应。</p>
+      </section>
+
+      <section class="takeaway">
+        <h2>一句话总结</h2>
+        <p>课程掩膜自监督预训练结合物理约束正则化，实现 30 m 且光谱合理的 AOD 反演。</p>
+      </section>
+
+      <section class="cite">
+        <h2>引用格式</h2>
+        <p class="code">XU X, ZHANG G, ZHANG R, et al. Spectral transformer with physics-informed regularization for high-resolution Landsat-8 AOD retrieval[J]. Journal of Quantitative Spectroscopy and Radiative Transfer, 2026, 364: 110084. DOI: 10.1016/j.jqsrt.2026.110084.</p>
+      </section>
+
+      <div class="actions">
+        <a class="btn" href="https://doi.org/10.1016/j.jqsrt.2026.110084" target="_blank" rel="noopener">查看原文</a>
+        <a class="btn outline" href="../index.html#publications">返回论文列表</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="foot">
+    <p>© 张荣庭 (Rongting Zhang) · 南京工业大学测绘科学与技术学院</p>
+  </footer>
+
+</body>
+</html>

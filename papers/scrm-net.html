@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCRM-Net：面向城市三维网格语义分割的自监督深度聚类特征表示方法 | 论文导读 - 张荣庭</title>
+  <meta name="description" content="自编码器与 GCN 双分支自监督深度聚类预训练，仅用 10% 标签微调即接近全监督的城市三维网格分割精度。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+  <link rel="stylesheet" href="../assets/css/paper.css">
+</head>
+<body>
+
+  <nav class="topbar">
+    <div class="wrap">
+      <a class="back" href="../index.html">← 返回主页</a>
+      <span class="crumb">论文导读 · 2025</span>
+    </div>
+  </nav>
+
+  <article class="paper">
+    <div class="wrap">
+      <span class="kicker">期刊论文 · 城市三维网格语义分割</span>
+      <h1>SCRM-Net：面向城市三维网格语义分割的自监督深度聚类特征表示方法</h1>
+      <p class="orig-title">SCRM-Net: Self-Supervised Deep Clustering Feature Representation for Urban 3D Mesh Semantic Segmentation</p>
+
+      <ul class="meta">
+        <li><b>作者：</b>Jiahui Wang, Wei Leng, Xinjie Hao, <span class="hl">Rongting Zhang</span>*, Guangyun Zhang</li>
+        <li><b>发表：</b>Remote Sensing (MDPI), 2025, 17(8): 1424</li>
+        <li><b>类型：</b>SCI 期刊论文</li>
+        <li><b>DOI：</b><a href="https://doi.org/10.3390/rs17081424" target="_blank" rel="noopener">10.3390/rs17081424</a></li>
+      </ul>
+
+      <section>
+        <h2>摘要</h2>
+        <p>基于深度学习网络获得的语义城市三维网格已广泛应用于城市分析，但训练这样的网络以提取判别性特征，通常需要大量标注样本；而城市三维场景复杂，获取足量标注样本费时费力。为在缺乏大量标注数据的情况下获得判别性特征，本文提出一种新的自监督深度聚类特征学习网络 SCRM-Net。该网络包含两个互相自监督的分支：一个分支利用自编码器学习城市三维网格的内在特征表示，另一个分支利用图卷积网络（GCN）捕捉样本之间的结构关系。在语义分割阶段，只需用有限比例的标注样本对 SCRM-Net 的预训练编码器进行微调以提取判别性特征，并训练由两层边缘卷积构成的分割头即可完成分割。大量对比实验验证了方法的有效性，并显示其相对于当前先进语义分割方法具有竞争力。</p>
+      </section>
+
+      <section>
+        <h2>研究背景与动机</h2>
+        <p>随着三维遥感数据获取成本下降、可获得性提高，构建城市三维网格场景数据集成为可能，三维网格的语义分割在城市规划、环境监测、智能交通与自动驾驶等领域具有重要价值。与点云等其他三维数据相比，三维网格具有连续表面的优势，能够更精确地刻画复杂城市场景的拓扑结构与细节形状。然而现有基于深度学习的场景语义分割研究多以三维点云为对象，而面向网格的监督式方法需要大量标注样本：城市三维场景复杂，标注工作劳动强度大、耗时长；标注不足又会降低分割精度。多模态方法虽通过融合影像、点云等数据提升效果，却引入了配准与多阶段融合带来的额外误差，且计算开销偏大。自监督学习作为无监督学习的一个分支，能够在少量标注下学习通用表示，为破解上述困境提供了思路；但面向三维网格的自监督语义分割研究仍很缺乏，而传统深度聚类模型又对噪声敏感、特征表示能力有限，并不适用于城市三维网格。SCRM-Net 正是针对这一空白提出的。</p>
+      </section>
+
+      <section>
+        <h2>方法与主要创新</h2>
+        <ul>
+          <li><b>双分支互自监督的深度聚类特征学习架构：</b>自编码器（AE）分支学习城市三维网格的几何与属性内在表示，图卷积网络（GCN）分支建模面片之间的拓扑结构关系；两个分支通过双重自监督机制联合优化聚类与特征表示学习，整个特征编码过程端到端进行。</li>
+          <li><b>紧凑的 87 维输入特征描述子与结构化小批量划分：</b>每个面片的特征由重心坐标 (x, y, z)、面片法向量 (a, b, c) 以及 27 个纹理采样点的归一化 RGB（共 81 维纹理信息）组成；小批量不使用随机采样，而是用 K-D 树按坐标检索 K 近邻来划分（K 取 800），且每个面片只属于一个小批量，以避免数据冗余与重复计算。</li>
+          <li><b>面向不平衡数据的聚类中心初始化：</b>以特征相似度构建 K 近邻图（GCN 分支中 k 取 7，相似度采用热核方法），并通过最远点采样（FPS）从约 1.3% 的特征样本中结合 K-means++ 初始化聚类中心；聚类数设为 15（大于语义类别数），以缓解类别不平衡对初始化的影响。</li>
+          <li><b>结构与属性融合的编码方式及双重自监督损失：</b>GCN 编码采用对称归一化的图卷积（Ã = A + I），并加入全连接投影层与逐元素跳跃连接以缓解过平滑与梯度消失；每一层的 AE 特征与 GCN 特征按 G̃ = λH + (1 − λ)G 逐元素相加融合；AE 与 GCN 分别有重构损失 LAE、LGCN，以及基于学生 t 分布软分配 qij 与目标分布 pij 的 KL 散度聚类损失 LC1、LC2，总损失为 L = αLC + βLR（LC = LC1 + LC2，LR = LAE + LGCN），文中取 α = 0.01、β = 1。</li>
+          <li><b>边缘卷积微调与子集样本微调策略：</b>放弃解码器、冻结预训练编码器作为特征提取器，在特征表示上构建带自环的 K 近邻有向图，用两层边缘卷积（边缘函数 Eθ(xi) = τθ(xi, xj − xi)，卷积输出经 LeakyReLU 与 LayerNorm 处理）把特征映射到 6 类语义标签，并用类别频率平方根的倒数加权交叉熵缓解类别不平衡；同时提出按批次随机选取 10% 的子集微调策略，在保持标签分布与预训练一致的同时显著缩短微调时间。</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>实验与结果</h2>
+        <p>实验在公开的 Semantic Urban Meshes（SUM）基准上开展。该纹理城市三维网格覆盖赫尔辛基约 4 km²，含地面、植被、建筑、水体、汽车、船只 6 类，共 64 个网格块；本文取 12 块训练、12 块测试，涉及样本 7 479 164 个，训练集中建筑占 51.03%、水体仅 1.13%，类别严重不平衡。指标为 OA、mAcc、mIoU、mF1。实现基于 PyTorch 2.6：第一阶段深度聚类训练 50 个 epoch（Adam，学习率 10⁻⁴），第二阶段冻结编码器、仅用 10% 真值标签微调两层边缘卷积分割头 150 个 epoch，重复 10 次取平均。</p>
+        <p>仅用 10% 标签时 OA 91.9%、mAcc 79.3%、mIoU 62.8%、mF1 74.5%（平均精确率 71.4%、召回率 79.3%），逐类精度为地面 84.1%、植被 94.9%、建筑 94.5%、水体 78.9%、汽车 54.3%、船只 68.8%；标签比例升至 30% 与 100% 时 OA 为 92.9% 与 93.2%、mIoU 为 65.0% 与 66.1%。与 PointNet、PointNet++、DGCNN、KPConv、SUM 五种监督基线相比，同样只给 10% 标签时，其 mAcc、mIoU、mF1 分别高出 12.7–46.3、17.7–39.4、19.0–44.1 个百分点。消融实验中，去掉法向量后 OA 降至 85.6%、mIoU 48.2%，去掉重心坐标后 OA 降至 87.2%；随机掩蔽 10% 与 30% 特征行时 OA 仍为 92.0% 与 91.6%。此外，在德国 H3D 数据集上按 10% 标签微调后亦具良好泛化能力。</p>
+      </section>
+
+      <section>
+        <h2>结论与意义</h2>
+        <p>本文据作者所知首次将自监督深度聚类方法用于三维网格的语义表示学习：提出基于 FPS 的平衡采样策略初始化聚类中心，并采用改进的双分支编码架构实现城市三维网格的稳健特征编码；语义分割阶段仅随机选取 10% 的真值标签微调，即在六类城市三维网格上取得 OA 91.9%、平均精确率 71.4%、平均召回率 79.3%、mF1 74.5%、mIoU 62.8%。这表明在标注代价高昂的城市三维场景中，「自监督预训练＋少量标签微调」是一条可行且具竞争力的技术路线，可显著降低人工标注成本。作者也指出，城市三维网格普遍存在类别不平衡，如何在自监督框架下为稀有类别学习稳健的语义表示是今后的重点；此外还计划把方法拓展到工业与自然环境等更多类型的三维数据。</p>
+      </section>
+
+      <section class="takeaway">
+        <h2>一句话总结</h2>
+        <p>自监督深度聚类预训练＋10% 标签微调，城市三维网格分割精度接近全监督。</p>
+      </section>
+
+      <section class="cite">
+        <h2>引用格式</h2>
+        <p class="code">Wang, J.; Leng, W.; Hao, X.; Zhang, R.; Zhang, G. SCRM-Net: Self-Supervised Deep Clustering Feature Representation for Urban 3D Mesh Semantic Segmentation[J]. Remote Sensing, 2025, 17(8): 1424. DOI: 10.3390/rs17081424.</p>
+      </section>
+
+      <div class="actions">
+        <a class="btn" href="https://www.mdpi.com/2072-4292/17/8/1424" target="_blank" rel="noopener">查看原文</a>
+        <a class="btn outline" href="../index.html#publications">返回论文列表</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="foot">
+    <p>© 张荣庭 (Rongting Zhang) · 南京工业大学测绘科学与技术学院</p>
+  </footer>
+
+</body>
+</html>

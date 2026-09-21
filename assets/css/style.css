@@ -125,6 +125,15 @@ a:hover { text-decoration: underline; }
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
 /* ---------- 论文列表 ---------- */
+.pub-hint {
+  font-size: 0.92rem;
+  color: var(--text-light);
+  background: #eef4fb;
+  border-left: 4px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 16px;
+  margin-bottom: 18px;
+}
 .pub-list { list-style: none; margin: 0 0 14px 0; }
 .pub-list li {
   padding: 12px 0;
@@ -132,9 +141,23 @@ a:hover { text-decoration: underline; }
 }
 .pub-list li:last-child { border-bottom: none; }
 .pub-title { font-weight: 600; }
+.pub-title a { color: var(--primary-dark); }
+.pub-title a:hover { color: var(--primary); }
+.pub-orig { font-size: 0.88rem; color: var(--text-light); font-style: italic; margin-top: 2px; }
 .pub-meta { font-size: 0.9rem; color: var(--text-light); margin-top: 2px; }
 .pub-links { margin-top: 6px; font-size: 0.88rem; }
 .pub-links a { margin-right: 14px; }
+.tag-link {
+  display: inline-block;
+  background: rgba(46, 139, 139, 0.12);
+  color: #1f6f6f !important;
+  border: 1px solid rgba(46, 139, 139, 0.35);
+  border-radius: 999px;
+  padding: 1px 12px;
+  font-weight: 600;
+  font-size: 0.84rem;
+}
+.tag-link:hover { background: rgba(46, 139, 139, 0.22); text-decoration: none; }
 .note { font-size: 0.88rem; color: var(--text-light); }
 
 /* ---------- 页脚 ---------- */

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>面向遥感影像理解的上下文增强与跨尺度语义对比自监督预训练方法 | 论文导读 - 张荣庭</title>
+  <meta name="description" content="提出三分支自监督预训练框架 CESC，兼顾上下文信息与跨尺度语义一致性，场景分类与语义分割均优于现有方法。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+  <link rel="stylesheet" href="../assets/css/paper.css">
+</head>
+<body>
+
+  <nav class="topbar">
+    <div class="wrap">
+      <a class="back" href="../index.html">← 返回主页</a>
+      <span class="crumb">论文导读 · 2026</span>
+    </div>
+  </nav>
+
+  <article class="paper">
+    <div class="wrap">
+      <span class="kicker">期刊论文 · 遥感影像自监督表征学习</span>
+      <h1>面向遥感影像理解的上下文增强与跨尺度语义对比自监督预训练方法</h1>
+      <p class="orig-title">Context-Enhanced and Scale-Contrastive Learning for Remote Sensing Imagery Understanding</p>
+
+      <ul class="meta">
+        <li><b>作者：</b>Aiping Hu, <span class="hl">Rongting Zhang</span>, Guangyun Zhang*</li>
+        <li><b>发表：</b>IEEE Geoscience and Remote Sensing Letters, 2026（已录用）</li>
+        <li><b>类型：</b>SCI 期刊论文</li>
+        <li><b>DOI：</b><a href="https://doi.org/10.1109/LGRS.2026.3678388" target="_blank" rel="noopener">10.1109/LGRS.2026.3678388</a></li>
+      </ul>
+
+      <section>
+        <h2>摘要</h2>
+        <p>自监督学习（SSL）能够从无标注数据中学习表征，但受复杂背景与严重目标尺度变化影响，直接应用于遥感（RS）影像仍具挑战。为此，本文提出面向遥感影像的自监督预训练框架 CESC（Context-Enhanced Semantic Contrast，上下文增强语义对比）。CESC 将掩码重建、显式上下文增强与跨尺度语义对比统一到同一个学习目标中：重建分支沿用掩码自编码器范式学习细粒度空间结构；上下文增强生成分支在未掩码的完整图像块上生成“重建模板”，为掩码位置提供高层语义先验，缓解高掩码率造成的上下文歧义；跨尺度对比分支通过随机裁剪与缩放构造低尺度视图，并以双向交叉预测在解码器层级对齐不同尺度的语义表征。在场景分类与语义分割基准上的大量实验表明，在同等实验设置下 CESC 一致优于当前最先进的自监督方法，验证了其有效性与可迁移性；同时相较标准 MAE，它不增加骨干网络参数与推理阶段的计算量。</p>
+      </section>
+
+      <section>
+        <h2>研究背景与动机</h2>
+        <p>卫星平台与传感技术的快速发展带来了海量高分辨率遥感影像，但其有效解译仍严重依赖密集的人工标注与任务定制的预处理，成本高昂且难以规模化。因此，利用无标注数据内在关联来学习可迁移表征的自监督学习受到越来越多关注。自然图像领域的自监督方法主要分为对比学习（CL）与掩码图像建模（MIM）两类：前者通过在嵌入空间施加实例级分离来学习判别性全局表征，却常常忽略细粒度空间细节；后者通过重建随机掩蔽区域来捕捉局部结构与上下文依赖，却容易过度关注低级纹理，导致全局语义判别能力不足。更关键的是，遥感影像的显著领域差异使这两类范式难以直接迁移：遥感影像为俯视成像，目标密集分布、前景—背景边界往往模糊，随机掩码可能把尺寸小或分布稀疏的目标完全遮挡，造成严重的上下文信息丢失；同时遥感场景普遍存在巨大的类内尺度变化，同一语义类别的目标以差异极大的尺寸出现，使现有方法难以学到尺度一致且鲁棒的表示。本文据此设计一个统一框架，同时缓解上下文丢失与尺度变化这两个核心问题。</p>
+      </section>
+
+      <section>
+        <h2>方法与主要创新</h2>
+        <p>CESC 由三个互补分支组成，共享同一套 ViT 编码器与解码器，在统一目标下联合优化，主要创新有以下五点。</p>
+        <ul>
+          <li><b>三分支统一自监督框架。</b>框架由重建分支、上下文增强生成分支与跨尺度对比分支构成，分别应对重掩码下的细粒度空间表征、随机掩码造成的上下文丢失、以及遥感场景的严重尺度变化；三分支共享编码器 f<sub>vit</sub> 与解码器 g<sub>vit</sub>，所有辅助分支仅在预训练阶段激活，下游微调与推理时只保留编码器，因此不引入额外骨干参数，推理配置与标准 MAE 完全一致。</li>
+          <li><b>重建分支（MAE 范式）。</b>输入影像划分为互不重叠的图像块集合 X<sup>p</sup>，按预设掩码比例随机掩蔽一部分；可见图像块经位置编码嵌入为潜在 token X̂<sup>p</sup> 后送入编码器 f<sub>vit</sub>，再由轻量 ViT 解码器 g<sub>vit</sub> 预测被掩码图像块的像素值，得到重建输出 Ŷ<sup>p</sup> = g<sub>vit</sub>(f<sub>vit</sub>(X̂<sup>p</sup>) ⊙ 掩码位置指示量)，其中掩码位置指示函数在对应图像块被掩蔽时取 1、否则取 0。</li>
+          <li><b>上下文增强生成分支。</b>该分支不进行任何掩码，直接处理完整的原始图像块集合 X<sup>p</sup>，经共享编码器与解码器得到 Y<sup>p</sup> = g<sub>vit</sub>(f<sub>vit</sub>(X<sup>p</sup>))，作为编码全局语义上下文的“重建模板”；训练时利用掩码位置参数把重建分支在掩码位置的输出与模板预测对齐，从而在重建输出层面显式注入上下文先验，使模型获得全局一致、上下文丰富的表示。</li>
+          <li><b>跨尺度对比分支。</b>由高分辨率影像 X<sup>h</sup> 经随机裁剪再缩放生成低尺度视图 X<sup>l</sup>，分块、掩码并经共享编解码器得到解码器级嵌入 Z<sup>l</sup>，再由轻量非线性预测头 Φ<sub>mlp</sub> 投影为高维特征 Ẑ<sup>l</sup><sub>p</sub> = Φ<sub>mlp</sub>(g<sub>vit</sub>(f<sub>vit</sub>(X̂<sup>l</sup><sub>p</sub>)))；采用双向交叉预测机制，让跨尺度分支与重建分支的解码器级嵌入互为预测源与目标，在解码器层级实现尺度不变的语义对齐，同时保留细粒度空间结构。</li>
+          <li><b>多损失联合优化。</b>总目标为 L = λ<sub>1</sub>L<sub>Re</sub> + λ<sub>2</sub>L<sub>Pr</sub> + λ<sub>3</sub>L<sub>Cc</sub> + λ<sub>4</sub>L<sub>Cl</sub>。其中重建损失 L<sub>Re</sub> 为掩码位置重建值 y<sup>Re</sup>|<sub>M</sub> 与真值 x|<sub>M</sub> 的 ℓ<sub>1</sub> 距离除以掩码像素数 N<sub>M</sub>；上下文预测损失 L<sub>Pr</sub> 为上下文预测 y<sup>Pr</sup> 与原图的 ℓ<sub>1</sub> 距离；上下文一致性损失 L<sub>Cc</sub> 强制 y<sup>Re</sup>|<sub>M</sub> 与 y<sup>Pr</sup>|<sub>M</sub> 在掩码位置像素级一致，且其梯度被刻意限制在重建分支，以保证语义外推始终在上下文先验指导下进行；跨尺度交叉预测损失 L<sub>Cl</sub> = ½(ℓ<sub>pred</sub>(f<sub>d,l</sub>,f<sub>d,h</sub>) + ℓ<sub>pred</sub>(f<sub>d,h</sub>,f<sub>d,l</sub>))，ℓ<sub>pred</sub> 为对目标表示与经投影头 g<sub>p</sub>（MLP）预测表示之间的均方误差，并对目标通路施加 stop-gradient 以防止训练崩溃。</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>实验与结果</h2>
+        <p>预训练使用 DIOR 数据集的训练与验证划分（11,725 张影像），以 ViT-B 骨干自监督训练 200 个 epoch；硬件仅为单张 RTX 4060 Ti（8 GB 显存）与 16 GB 内存，采用 AdamW 优化器，学习率 1.25×10<sup>−4</sup>、批大小 32、权重衰减 0.05，并使用含 40 个 epoch 预热的余弦学习率调度。对比方法包括 SeCo、GASSL、CMID、RingMo、MAE、Scale-MAE、Cross-Scale MAE 与 SelectiveMAE，全部在相同数据与相同设置下预训练；实验重复 5 次不同随机种子并报告均值±标准差。场景分类在 EuroSAT 与 NWPU-RESISC45 上按 20% 训练、80% 测试划分，CESC 的 Top-1 精度达 95.94%±0.02 与 84.51%±0.09，优于 CrossScaleMAE（94.88%、83.22%）、SelectiveMAE（94.29%、83.02%）、ScaleMAE（94.16%、82.01%）与 MAE（92.31%、79.13%），也超过使用更强 Swin-B 骨干的 RingMo（93.54%、83.48%）与 CMID（92.55%、82.38%）。语义分割以 UperNet 为框架（512×512 裁剪、步长 256，训练 160k 次迭代，指标为 mIoU 与 mAcc），CESC 在 Potsdam 上取得 63.88±0.11 mIoU 与 75.18±0.03 mAcc，在 Vaihingen 上取得 63.69±0.15 mIoU 与 73.63±0.08 mAcc，两个数据集上均为最高，领先 CrossScaleMAE 与 RingMo。消融实验（在 NWPU-RESISC45 与 Potsdam 上微调评估）表明三分支互补：仅重建分支时为 83.22±0.21（Top-1）与 63.11±0.16（mIoU），加入上下文增强生成分支后为 83.94±0.06 与 63.46±0.26，加入跨尺度对比分支后为 84.51±0.11 与 63.20±0.15，三分支同时启用最优（84.51±0.09 与 63.88±0.11）；掩码率取 0.75、四项损失权重均设为 1 时性能最好，降低任一损失权重都会带来下降。</p>
+      </section>
+
+      <section>
+        <h2>结论与意义</h2>
+        <p>CESC 通过联合建模像素级重建与跨尺度语义级对齐，学到既保留细粒度空间细节、又对大尺度变化鲁棒的表示。在场景分类与语义分割基准上的实验证明了所学表示的泛化性与可迁移性，消融研究验证了各分量的互补作用；结果表明，显式引入上下文信息与跨尺度语义一致性，对遥感自监督表示学习至关重要。方法的现实意义在于：预训练可在单张 8 GB 显存显卡上完成，且下游推理配置与标准 MAE 完全一致，便于在算力受限的遥感解译任务中落地。后续可进一步探索更优的掩码策略、更多层次的尺度视图，以及向 SAR、高光谱等多模态遥感数据的统一预训练扩展。</p>
+      </section>
+
+      <section class="takeaway">
+        <h2>一句话总结</h2>
+        <p>三分支自监督预训练兼顾上下文与跨尺度语义，分类分割均优于现有方法。</p>
+      </section>
+
+      <section class="cite">
+        <h2>引用格式</h2>
+        <p class="code">Hu A, Zhang R, Zhang G. Context-Enhanced and Scale-Contrastive Learning for Remote Sensing Imagery Understanding[J]. IEEE Geoscience and Remote Sensing Letters, 2026. DOI: 10.1109/LGRS.2026.3678388.</p>
+      </section>
+
+      <div class="actions">
+        <a class="btn" href="https://doi.org/10.1109/LGRS.2026.3678388" target="_blank" rel="noopener">查看原文</a>
+        <a class="btn outline" href="../index.html#publications">返回论文列表</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="foot">
+    <p>© 张荣庭 (Rongting Zhang) · 南京工业大学测绘科学与技术学院</p>
+  </footer>
+
+</body>
+</html>

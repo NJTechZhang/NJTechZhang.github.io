@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>基于 FPGA 的 RPC 卫星影像正射纠正 | 论文导读 - 张荣庭</title>
+  <meta name="description" content="用定点化 RPC 算法与 FPGA 三模块流水线架构实现星上正射纠正，吞吐达 675.67 Mpixels/s，平面 RMSE 优于半像元。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+  <link rel="stylesheet" href="../assets/css/paper.css">
+</head>
+<body>
+
+  <nav class="topbar">
+    <div class="wrap">
+      <a class="back" href="../index.html">← 返回主页</a>
+      <span class="crumb">论文导读 · 2018</span>
+    </div>
+  </nav>
+
+  <article class="paper">
+    <div class="wrap">
+      <span class="kicker">期刊论文 · 摄影测量几何处理与 FPGA 硬件加速</span>
+      <h1>基于 FPGA 的 RPC 卫星影像正射纠正</h1>
+      <p class="orig-title">RPC-Based Orthorectification for Satellite Images Using FPGA</p>
+
+      <ul class="meta">
+        <li><b>作者：</b><span class="hl">张荣庭</span> (Rongting Zhang), Guoqing Zhou*, Guangyun Zhang, Xiang Zhou, Jingjin Huang</li>
+        <li><b>发表：</b>Sensors（传感器，MDPI）, 2018, 18(8): 2511</li>
+        <li><b>类型：</b>SCI 期刊论文</li>
+        <li><b>DOI：</b><a href="https://doi.org/10.3390/s18082511" target="_blank" rel="noopener">10.3390/s18082511</a></li>
+      </ul>
+
+      <section>
+        <h2>摘要</h2>
+        <p>传统基于有理多项式系数（RPC）的正射纠正方法无法满足恐怖袭击、灾害救援等任务对快速响应的需求。为加快正射纠正速度，本文提出基于现场可编程门阵列（FPGA）的定点（FP）RPC 星上正射纠正方法：先用定点算术改写 RPC 算法，把浮点变量与常数按 2 的幂次比例因子转换为整数；再在 FPGA 芯片上实现该 FP-RPC 算法。方法划分为读取参数模块、坐标变换模块和插值模块三个主要模块，插值采用双线性插值。两组数据集的验证表明：与个人计算机上 Matlab 实现的 RPC 方法相比，本文方法与 Matlab 方法的吞吐量分别为 675.67 Mpixels/s 和 61 070.24 pixels/s，处理同样影像约快 11 000 倍；精度上，第一研究区行坐标、列坐标与距离的均方根误差分别为 0.35、0.30 和 0.46 像元，第二研究区分别为 0.27、0.36 和 0.44 像元，满足实际纠正精度要求。</p>
+      </section>
+
+      <section>
+        <h2>研究背景与动机</h2>
+        <p>正射纠正是把影像纠正到正射平面、消除透视投影影响的处理过程，是遥感影像用于国土资源调查、灾害监测、森林资源清查与环境变化分析等任务的前提；经正射纠正的影像既具备地图的几何精度，又保留遥感影像的特性。</p>
+        <p>高分辨率卫星传感器普遍采用线阵 CCD 推扫式成像，与常规航空框幅式成像不同。为处理多种类型的影像，学者们提出了多种几何处理模型，其中应用最广的是有理多项式系数（RPC）模型：它与卫星传感器和平台无关，不需要内、外方位元素（这些参数有时并不由数据供应商提供），却能达到与严密物理模型相当的精度，因此被广泛用于高分辨率卫星影像的正射纠正。</p>
+        <p>然而 RPC 算法包含大量浮点运算，计算代价高昂；而灾害救援与突发事件应急响应要求近实时甚至星上（on-board）完成几何处理，若把原始影像下传地面再处理会带来明显时延。与 GPU、CPU 相比，FPGA 在体积、重量与功耗（SWaP）上更有优势，其流水线结构与细粒度并行特性也适合高吞吐数据处理，便于集成到星上系统。因此本文要解决的问题是：在保证纠正精度的前提下，如何用 FPGA 显著加速 RPC 正射纠正，使其可在星上近实时执行。</p>
+      </section>
+
+      <section>
+        <h2>方法与主要创新</h2>
+        <ul>
+          <li><b>定点化 RPC（FP-RPC）算法。</b>把浮点变量与常数统一按 F=⌊2<sup>τ</sup>·F′⌉ 转换为整数，τ 为比例因子，取值越大二进制精度越高。多项式系数 a′<sub>i</sub>、b′<sub>i</sub>、c′<sub>i</sub>、d′<sub>i</sub>（i=1–20）取 τ<sub>1</sub>=30；经纬高 Lon′、Lat′、Hei′ 与归一化参数取 τ<sub>2</sub>=23（第二研究区的 H′<sub>off</sub>、H′<sub>scale</sub> 取 21）；影像坐标归一化参数 Line′、Samp′ 相关项取 τ<sub>3</sub>=18（第二研究区为 16）。全部参数以 32 位定点表示以保证计算精度，工作时钟频率 100 MHz。归一化坐标、多项式分子分母与影像坐标的整数化公式形式统一，便于并行实现。</li>
+          <li><b>三模块并行流水线硬件架构。</b>整体分为 Read_parameter_mod（RPM，读取参数模块）、Coordinate_Transform_mod（CTM，坐标变换模块）与 Interpolation_mod（IM，插值模块）。RPM 把存储在 RAM 中的大地坐标、常数与启动信号 Start_Sig 在同一时钟周期送出，并依据插值模块反馈信号 Feedback_Sig 控制读取节奏，全部处理完成后产生 ALL_Done_Sig；CTM 完成大地坐标到影像坐标的变换；IM 完成灰度重采样。</li>
+          <li><b>CTM 的四个并行子模块。</b>ReM（归一化模块）把大地坐标 (Lat,Lon,Hei) 归一化为 (L,P,H)，以并行结构同时计算三个分量；PM（多项式模块）计算分子分母 NumL、NumS、DenL、DenS，其中使用 35 个乘法器与 19 个扩展加法，每个扩展加法按同号/异号三种情形分别处理，含 3 个触发器、4 个选择器、7 个加法器与 11 个多路选择器；RaM（比值模块）并行求解归一化影像坐标 X、Y（含 1 个除法器、3 个加法器、6 个多路选择器、6 个触发器与 32 个选择器）；RCM（影像坐标计算模块）计算行列号 Samp、Line（含 1 个乘法器、4 个触发器、5 个共享选择器、7 个加法器与 136 个 MUX21）。各子模块通过 done 信号在同一时钟周期完成数据交接，形成流水线。</li>
+          <li><b>双线性插值模块。</b>综合考虑精度与 FPGA 资源，灰度重采样选用双线性插值：并行计算插值所需的 4 个灰度值，并用两级加法结构完成 4 个变量的求和，在保证精度的同时节省逻辑资源。</li>
+          <li><b>星上集成可行性。</b>整个设计以 Verilog 语言实现后写入所选 FPGA 器件，可编程为星上系统的一部分，替代"下传—地面处理"的流程。</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>实验与结果</h2>
+        <p><b>硬件与数据。</b>硬件采用 Altera FPGA（器件 Kintex-7 XC7K325TFFG900-1，时钟 100 MHz，设计工具 Vivado 2016.4），对照实现为个人计算机上的 Matlab 2012a（i7-4790 @3.6 GHz、8 GB RAM），并以 Matlab 结果生成的正射影像作为精度参考。数据为两景全色影像：美国加州圣迭戈的 IKONOS-2 影像（分辨率 1.0 m，波长 450–900 nm）与中国内蒙古根河的 SPOT-6 影像（分辨率 1.5 m，波长 450–745 nm）。</p>
+        <p><b>纠正精度。</b>每个研究区随机选取 40 个检查点，按行坐标差 ΔI、列坐标差 ΔJ 与距离 ΔS 计算 RMSE：第一研究区分别为 0.35、0.30 和 0.46 像元，第二研究区分别为 0.27、0.36 和 0.44 像元，均小于 1 个像元，满足实际纠正精度要求；两平台结果的差异主要来自定点计算的误差传播与累积。</p>
+        <p><b>处理速度。</b>以 10 次运行的平均耗时计，256×256、512×512、1024×1024 影像的加速比分别为 10 855.87、11 008.82 和 11 095.87 倍，随影像尺寸增大而提高；吞吐量方面，本文方法约 675.67 Mpixels/s，明显高于 Matlab 方法的 61 070.24 pixels/s，即约快 11 000 倍。</p>
+        <p><b>资源占用。</b>Slice LUT 使用 90 634/203 800（44.42%）、Slice Register 使用 22 798/407 600（5.59%）、输入输出（IO）使用 368/500（73.60%），器件满足设计需求并留有裕量。</p>
+      </section>
+
+      <section>
+        <h2>结论与意义</h2>
+        <p>本文提出的 FPGA 星上定点 RPC 正射纠正方法，通过定点化改写降低浮点计算代价，并通过三模块并行流水线提升吞吐，在保持亚像元级纠正精度的同时把处理速度提高约四个数量级。结论有三：其一，定点化改写与 32 位定点表示能够满足实际纠正精度要求，两景测试影像的行、列坐标及距离 RMSE 均在 0.46 像元以内；其二，读取参数模块、坐标变换模块与插值模块构成的流水线在 100 MHz 时钟下达到 675.67 Mpixels/s 的吞吐量，比 PC 上的 Matlab 实现约快 11 000 倍；其三，资源占用合理（LUT 44.42%、寄存器 5.59%、IO 73.60%），便于与星上系统集成。方法可用于灾害与突发事件应急响应、快速测绘等场景，后续可优化定点位宽与比例因子以抑制误差累积，并把该架构扩展到多光谱、多传感器影像。</p>
+      </section>
+
+      <section class="takeaway">
+        <h2>一句话总结</h2>
+        <p>定点化 RPC 加 FPGA 流水线，使星上正射纠正达亚像元精度并提速约一万倍。</p>
+      </section>
+
+      <section class="cite">
+        <h2>引用格式</h2>
+        <p class="code">ZHANG R, ZHOU G, ZHANG G, et al. RPC-based orthorectification for satellite images using FPGA[J]. Sensors, 2018, 18(8): 2511. DOI: 10.3390/s18082511.</p>
+      </section>
+
+      <div class="actions">
+        <a class="btn" href="https://www.mdpi.com/1424-8220/18/8/2511" target="_blank" rel="noopener">查看原文</a>
+        <a class="btn outline" href="../index.html#publications">返回论文列表</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="foot">
+    <p>© 张荣庭 (Rongting Zhang) · 南京工业大学测绘科学与技术学院</p>
+  </footer>
+
+</body>
+</html>

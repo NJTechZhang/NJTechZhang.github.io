@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>面向高光谱目标检测的多变量高斯去噪扩散模型背景抑制方法 | 论文导读 - 张荣庭</title>
+  <meta name="description" content="用多变量高斯背景噪声驱动扩散模型抑制高光谱复杂背景，在四个数据集上取得领先的背景抑制效果。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+  <link rel="stylesheet" href="../assets/css/paper.css">
+</head>
+<body>
+
+  <nav class="topbar">
+    <div class="wrap">
+      <a class="back" href="../index.html">← 返回主页</a>
+      <span class="crumb">论文导读 · 2026</span>
+    </div>
+  </nav>
+
+  <article class="paper">
+    <div class="wrap">
+      <span class="kicker">期刊论文 · 高光谱影像目标检测</span>
+      <h1>面向高光谱目标检测的多变量高斯去噪扩散模型背景抑制方法</h1>
+      <p class="orig-title">Background Suppression by Multivariate Gaussian Denoising Diffusion Model for Hyperspectral Target Detection</p>
+
+      <ul class="meta">
+        <li><b>作者：</b>Weile Han, Yuteng Huang, Jiaqi Feng, <span class="hl">Rongting Zhang</span>, Guangyun Zhang*</li>
+        <li><b>发表：</b>Remote Sensing (MDPI), 2026, 18(1): 64</li>
+        <li><b>类型：</b>SCI 期刊论文（中科院二区）</li>
+        <li><b>DOI：</b><a href="https://doi.org/10.3390/rs18010064" target="_blank" rel="noopener">10.3390/rs18010064</a></li>
+      </ul>
+
+      <section>
+        <h2>摘要</h2>
+        <p>高光谱影像（HSI）目标检测在军事侦察、环境监测、精准农业等军民领域具有重要作用，但场景的复杂背景严重制约了检测性能的进一步提升。为此，本文提出一种基于多变量高斯背景噪声的扩散模型高光谱目标检测方法：构造服从多变量高斯分布的背景噪声样本，并将其引入扩散模型的前向扩散过程；随后训练去噪网络、参数化条件概率分布，并以专门设计的损失函数优化去噪性能，实现对背景的有效抑制，从而提升检测性能。为获得准确的背景噪声，本文提出基于空间—光谱中心加权的背景噪声提取策略（SSBNG），结合超像素分割技术融合高光谱影像的局部空间邻域信息，并借助 CEM 滤波器剔除与目标先验光谱高度相似的样本，保证背景样本的纯度。在四个公开高光谱数据集上的实验表明，该方法取得了领先的背景抑制效果和有竞争力的检测性能，ROC 曲线与 AUC 族指标验证了所提“背景抑制引导扩散”框架的有效性。</p>
+      </section>
+
+      <section>
+        <h2>研究背景与动机</h2>
+        <p>高光谱影像“图谱合一”，可依据地物精细的光谱特征识别特定目标，是目标检测的重要数据源，然而复杂背景下的检测仍是难题。传统方法以约束能量最小化（CEM）及其变体（H-CEM、集成 CEM、迭代核 CEM、多方向 CEM 等）为代表，还包括正交子空间投影（OSP）、TCIMF、光谱角制图（SAM）、多信号子空间检测（MSD）、自适应余弦估计（ACE）与匹配滤波等，它们多依赖线性光谱匹配，难以刻画非线性背景结构，虚警率往往偏高；深度学习类方法（自编码器、HTD-Net、变分自编码器、BLTSC、OS-VAE 等）尝试全局建模背景，却对局部空间—光谱变化刻画不足，检测图仍存在背景泄漏或目标覆盖不完整。更本质的困难在于：目标与背景在部分波段光谱高度相似，弱目标容易被背景淹没，检测精度与虚警率相互制约。另一方面，扩散模型已在自然语言处理、时间序列预测、分子图生成等任务中取得成功，但尚未应用于高光谱目标检测；而且传统去噪扩散概率模型（DDPM）使用标准高斯噪声，高光谱背景噪声却不服从标准高斯分布，其噪声扩散方程无法直接套用。本文因此转换思路：把“背景”视为可建模的噪声分布，让扩散过程专门针对背景噪声，通过扩散—去噪机制抑制背景、突出目标。</p>
+      </section>
+
+      <section>
+        <h2>方法与主要创新</h2>
+        <p>方法可概括为“生成背景噪声—改造扩散/去噪过程—马氏距离检测”三段式流程，主要创新有以下五点。</p>
+        <ul>
+          <li><b>空间—光谱中心加权背景噪声生成（SSBNG）策略。</b>从高光谱影像中选取三个波段合成伪彩色影像，用 SLIC 方法分割为 N<sub>s</sub> 个超像素；先以超像素内所有像素的平均光谱 x̄<sub>i</sub> 作为初始背景样本，再以欧氏距离 g(x<sub>ij</sub>, x̄<sub>i</sub>) = ‖x<sub>ij</sub> − x̄<sub>i</sub>‖<sub>2</sub> 度量像素与平均光谱的偏离程度，并用权重函数 f(g) = 1/2 · (1 − (g/γ)<sup>2</sup>)<sup>2</sup> 加权（γ 取该超像素内 g 的最大值以实现归一化），按 y<sub>i</sub> = Σ x<sub>ij</sub>f(g) / Σ f(g) 重算背景样本光谱，使接近平均光谱的像素被强调、异常像素的影响被削弱。</li>
+          <li><b>基于 CEM 滤波的背景样本纯化。</b>部分超像素可能包含目标像素而污染背景样本，因此引入 CEM 滤波器计算背景样本光谱与目标先验光谱 d 的相似度响应 s = (ŵ)<sup>T</sup>Y，其中 R = (1/N<sub>s</sub>)YY<sup>T</sup> 为相关矩阵；按相似度降序剔除前 20% 的样本，使生成的背景样本尽可能反映纯背景特性。</li>
+          <li><b>多变量高斯背景噪声建模。</b>对纯化后的背景样本统计均值 μ<sub>b</sub> 与协方差矩阵 Σ<sub>b</sub>，再用多变量高斯分布生成背景噪声样本 N<sub>b</sub>，使噪声在特征空间中的分布与真实背景的统计特性一致，为后续噪声注入提供高质量样本。</li>
+          <li><b>面向背景噪声的扩散与去噪过程改造。</b>扩散步定义为 X<sub>t</sub> = a<sub>t</sub>X<sub>t−1</sub> + √(1−a<sub>t</sub>)·z<sub>t</sub>，其中 z<sub>t</sub> ~ N(μ<sub>b</sub>, Σ<sub>b</sub>) 而非标准高斯噪声，a<sub>t</sub> 采用线性调度；由此得到的转移概率 q(X<sub>t</sub>|X<sub>t−1</sub>) = N(X<sub>t</sub>; √α<sub>t</sub>X<sub>t−1</sub> + (1−√α<sub>t</sub>)μ<sub>b</sub>, (1−α<sub>t</sub>)Σ<sub>b</sub>) 同时包含上一状态与背景均值 μ<sub>b</sub>。去噪均值参数化为 μ<sub>θ</sub>(X<sub>t</sub>,t) = (1/α<sub>t</sub>)(X<sub>t</sub> − ((1−α<sub>t</sub>)/(1−ᾱ<sub>t</sub>))ε<sub>θ</sub>(X<sub>t</sub>,t)) + (1−α<sub>t</sub>)μ<sub>b</sub>，去噪网络由 256 通道预嵌入层与 200/100/50 通道三层残差结构组成，每层使用 Tanh 激活与 LayerNorm 归一化并带跳跃连接。</li>
+          <li><b>协方差加权损失与马氏距离检测。</b>损失函数以 Σ<sub>b</sub><sup>−1</sup> 为权重矩阵，L(θ) = E[(ε<sub>θ</sub>(X<sub>t</sub>,t) − (z − μ<sub>b</sub>))<sup>T</sup>Σ<sub>b</sub><sup>−1</sup>(ε<sub>θ</sub>(X<sub>t</sub>,t) − (z − μ<sub>b</sub>))]，按背景协方差对各维噪声误差加权，使预测噪声逼近真实背景噪声；检测阶段用训练好的去噪网络把复杂背景当作噪声去除，得到背景抑制影像 X̂，再基于扩散前已定位的背景区域重建背景模型（均值 μ<sub>B</sub>、协方差 Σ<sub>B</sub>），以马氏距离 D<sub>M</sub>(x) = √((x−μ<sub>B</sub>)<sup>T</sup>Σ<sub>B</sub><sup>−1</sup>(x−μ<sub>B</sub>)) 输出检测结果，距离越大越可能属于目标。</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>实验与结果</h2>
+        <p>实验在四个公开高光谱数据集上开展：HYDICE（城区，80×100 像素、175 波段、400–2500 nm、1 m 分辨率，车辆与屋顶共 19 个目标像素）、San Diego 与 San Diego2（AVIRIS 获取的圣迭戈机场，100×100 像素、370–2510 nm，剔除水汽吸收与低信噪比波段后使用 189 波段，三架飞机分别占 57 与 134 像素）、ABU-beach-1（AVIRIS，150×150 像素、188 波段）。对比方法包括 CEM、H-CEM、ACE、DSC、BLTSC 与 OS-VAE；评价采用 ROC 曲线及 AUC(P<sub>f</sub>,P<sub>d</sub>)、AUC(τ,P<sub>d</sub>)、AUC(τ,P<sub>f</sub>)，并给出组合指标 AUC<sub>OA</sub> = AUC(P<sub>f</sub>,P<sub>d</sub>) − AUC(τ,P<sub>f</sub>) + AUC(τ,P<sub>d</sub>)、AUC<sub>SNPR</sub> = AUC(τ,P<sub>d</sub>)/AUC(τ,P<sub>f</sub>) 与 AP。结果表明，本文方法在四个数据集上分别取得 0.9902（ABU-Beach-1）、0.9946（HYDICE）、0.9971（San Diego）与 0.9953（San Diego2）的 AUC(P<sub>f</sub>,P<sub>d</sub>)，其中后三个数据集为最高值，ABU-Beach-1 与最高的 H-CEM（0.9903）基本持平；同时取得最低的 AUC(τ,P<sub>f</sub>)（越小越好），分别为 0.0004、0.0045、0.0008、0.0012，明显优于 CEM（0.0909、0.1646、0.2376、0.2148）等方法；AUC<sub>SNPR</sub> 依次为 325.40、83.20、211.74、158.91，均为最高，ABU-Beach-1 上 AP 达 0.8596，也是对比中最优。DSC 在 AUC(τ,P<sub>d</sub>) 上表现最好，但其虚警明显更高。消融实验（表 5）显示超像素分割与背景抑制两项设计互补：两者同时启用时效果最佳，例如 ABU-beach-1 的 AUC(P<sub>f</sub>,P<sub>d</sub>) 由 0.9843 提升至 0.9902、HYDICE 由 0.9896 提升至 0.9946、San Diego 由 0.9802 提升至 0.9971、San Diego2 由 0.9778 提升至 0.9953，AUC(τ,P<sub>f</sub>) 也同步下降到 0.0004 量级。参数分析表明，超像素数 N<sub>s</sub> 在 ABU-beach-1、HYDICE、San Diego、San Diego2 上分别取 2000、1000、1750、1250 时 AUC 最高，时间步 t 亦需根据数据在抑制不足与噪声过量之间折中选取。</p>
+      </section>
+
+      <section>
+        <h2>结论与意义</h2>
+        <p>本文将扩散模型引入高光谱目标检测，把背景视为可建模的噪声分布，通过多变量高斯背景噪声来驱动前向扩散、指导去噪网络学习，从而在保留目标信号的同时抑制复杂背景。其价值在于两点：一是显著提升了现有深度学习类高光谱目标检测方法的性能，二是指出“充分考虑背景信息并实施有效背景抑制”这一研究思路。方法适用于高度复杂、异构背景下的弱目标检测场景。局限也很明确：本文用单一多变量高斯建模背景，仅对背景较为均质或由单一材质主导的场景成立，在多材质高度异构的场景中背景可能呈多峰分布，后续可替换为高斯混合模型以增强建模能力；此外方法依赖超像素背景提取与 CEM 纯化，时间步 t 与超像素数 N<sub>s</sub> 需随数据分辨率调整。</p>
+      </section>
+
+      <section class="takeaway">
+        <h2>一句话总结</h2>
+        <p>以多变量高斯背景噪声驱动扩散去噪，显著抑制高光谱复杂背景。</p>
+      </section>
+
+      <section class="cite">
+        <h2>引用格式</h2>
+        <p class="code">Han W, Huang Y, Feng J, Zhang R, Zhang G. Background Suppression by Multivariate Gaussian Denoising Diffusion Model for Hyperspectral Target Detection[J]. Remote Sensing, 2026, 18(1): 64. DOI: 10.3390/rs18010064.</p>
+      </section>
+
+      <div class="actions">
+        <a class="btn" href="https://www.mdpi.com/2072-4292/18/1/64" target="_blank" rel="noopener">查看原文</a>
+        <a class="btn outline" href="../index.html#publications">返回论文列表</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="foot">
+    <p>© 张荣庭 (Rongting Zhang) · 南京工业大学测绘科学与技术学院</p>
+  </footer>
+
+</body>
+</html>

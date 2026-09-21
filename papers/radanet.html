@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RADANet：面向复杂高分辨率遥感影像道路提取的道路增强可变形注意力网络 | 论文导读 - 张荣庭</title>
+  <meta name="description" content="提出道路增强模块与可变形注意力模块相结合的道路提取网络 RADANet，在 DeepGlobe 与 CHN6-CUG 数据集上取得优于现有方法的结果。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+  <link rel="stylesheet" href="../assets/css/paper.css">
+</head>
+<body>
+
+  <nav class="topbar">
+    <div class="wrap">
+      <a class="back" href="../index.html">← 返回主页</a>
+      <span class="crumb">论文导读 · 2023</span>
+    </div>
+  </nav>
+
+  <article class="paper">
+    <div class="wrap">
+      <span class="kicker">期刊论文 · 遥感影像道路提取</span>
+      <h1>RADANet：面向复杂高分辨率遥感影像道路提取的道路增强可变形注意力网络</h1>
+      <p class="orig-title">RADANet: Road Augmented Deformable Attention Network for Road Extraction From Complex High-Resolution Remote-Sensing Images</p>
+
+      <ul class="meta">
+        <li><b>作者：</b><span class="hl">L. Dai</span>, G. Zhang, <span class="hl">R. Zhang</span>（戴磊、张广运、张荣庭）</li>
+        <li><b>发表：</b>IEEE Transactions on Geoscience and Remote Sensing, 2023, 61: 1–13</li>
+        <li><b>类型：</b>SCI 期刊论文（中科院一区 TOP）</li>
+        <li><b>DOI：</b><a href="https://doi.org/10.1109/TGRS.2023.3237561" target="_blank" rel="noopener">10.1109/TGRS.2023.3237561</a></li>
+      </ul>
+
+      <p class="note">说明：本页导读依据论文公开摘要整理（该文为 IEEE 订阅论文，未获取全文 PDF），方法与数据细节以原文为准。</p>
+
+      <section>
+        <h2>摘要</h2>
+        <p>
+          从复杂的高分辨率遥感影像中提取道路、进而更新路网数据，是近年来的研究热点。在日益复杂的道路环境中，如何恰当地利用道路的<strong>上下文空间关联</strong>与<strong>拓扑结构</strong>来提升提取精度，成为一项挑战。受道路形状先验知识与可变形卷积研究进展的启发，本文提出<strong>道路增强可变形注意力网络（RADANet）</strong>，用于学习特定道路像素的长程依赖关系。作者设计了<strong>道路增强模块（RAM）</strong>，通过四条条带卷积捕获道路的语义形状信息；<strong>可变形注意力模块（DAM）</strong>则将可变形卷积的稀疏采样能力与空间自注意力机制相结合，并与 RAM 集成，使网络能够更有针对性地提取道路特征。在 DeepGlobe 与 CHN6-CUG 两个代表性公开道路数据集上的实验表明，RADANet 相比现有先进方法取得了更优的结果。
+        </p>
+      </section>
+
+      <section>
+        <h2>研究背景与动机</h2>
+        <p>
+          道路是重要的基础地理信息要素，基于遥感影像的道路自动提取可显著降低路网更新的成本。然而高分辨率影像中的道路环境日趋复杂：道路呈细长条带状分布、易被建筑与树木遮挡、与停车场等硬化地表存在光谱混淆，且不同等级道路的宽度与形态差异明显。
+        </p>
+        <p>
+          标准卷积的感受野固定，难以适应道路这种具有强方向性和长程连续性的目标；而标准 Transformer 的全局自注意力计算量大，且缺乏对道路几何先验的显式利用。本文的动机即在于：把<strong>道路形状先验</strong>（条带状结构）与<strong>可变形卷积的稀疏自适应采样</strong>结合起来，使注意力集中到真正属于道路的像素上，从而在复杂场景下获得更稳健的提取结果。
+        </p>
+      </section>
+
+      <section>
+        <h2>方法与主要创新</h2>
+        <ul>
+          <li><strong>道路增强模块（RAM）</strong>：采用四条<strong>条带卷积（strip convolution）</strong>从不同方向捕获道路的语义形状信息，显式建模道路的细长条带结构。</li>
+          <li><strong>可变形注意力模块（DAM）</strong>：把可变形卷积的稀疏采样能力与空间自注意力机制融合，使采样点可自适应地落在道路结构上，从而以较低代价建模长程依赖。</li>
+          <li><strong>RAM 与 DAM 的协同设计</strong>：RAM 的输出用于引导 DAM 更有针对性地提取道路特征，二者集成形成道路增强的可变形注意力结构。</li>
+          <li><strong>编解码器中的合理布局</strong>：RAM 置于编码器第四阶段之后，DAM 置于编码器后四个阶段与解码器之间，从而在多个尺度上提取道路语义信息。</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>实验与结果</h2>
+        <p>
+          论文在<strong>两个代表性公开道路数据集</strong>——<strong>DeepGlobe</strong> 与 <strong>CHN6-CUG</strong> 道路数据集上开展了系统性实验，并将 RADANet 与当时的多种先进道路提取方法进行对比。摘要指出，在两类数据上 RADANet 均取得了优于对比方法的提取结果，验证了道路形状先验与可变形注意力结合的有效性。
+        </p>
+        <p>
+          需要说明的是，由于该文为订阅制论文，本导读未能获取原文中的具体数值指标（如 IoU、F1 等）与逐项消融实验数据，建议查阅原文正文获取完整的定量结果。
+        </p>
+      </section>
+
+      <section>
+        <h2>结论与意义</h2>
+        <p>
+          该研究表明：将道路的<strong>几何形状先验</strong>以条带卷积的形式注入网络，并借助可变形注意力实现稀疏而长程的特征聚合，是提升复杂场景道路提取精度的有效途径。RAM 与 DAM 的设计思路具有较好的可迁移性，可推广到河流、电力线等其它细长线性地物的提取任务，也可为路网更新、自动驾驶高精地图生产等应用提供算法支撑。
+        </p>
+      </section>
+
+      <section class="takeaway">
+        <h2>一句话总结</h2>
+        <p>用条带卷积学习道路形状先验、用可变形注意力聚焦道路像素，在复杂影像中把路提得更准。</p>
+      </section>
+
+      <section class="cite">
+        <h2>引用格式</h2>
+        <p class="code">L. Dai, G. Zhang, and R. Zhang, "RADANet: Road Augmented Deformable Attention Network for Road Extraction From Complex High-Resolution Remote-Sensing Images," IEEE Transactions on Geoscience and Remote Sensing, vol. 61, pp. 1–13, 2023, doi: 10.1109/TGRS.2023.3237561.</p>
+      </section>
+
+      <div class="actions">
+        <a class="btn" href="https://ieeexplore.ieee.org/abstract/document/10023525/" target="_blank" rel="noopener">查看原文</a>
+        <a class="btn outline" href="../index.html#publications">返回论文列表</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="foot">
+    <p>© 张荣庭 (Rongting Zhang) · 南京工业大学测绘科学与技术学院</p>
+  </footer>
+
+</body>
+</html>

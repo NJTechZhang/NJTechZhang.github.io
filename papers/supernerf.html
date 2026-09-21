@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SuperNeRF：面向大范围场景的高精度三维重建方法 | 论文导读 - 张荣庭</title>
+  <meta name="description" content="为 NeRF 增加超像素辐射一致性损失，引导相邻相似像素收敛到一致的颜色与深度，显著提升大范围场景重建精度。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+  <link rel="stylesheet" href="../assets/css/paper.css">
+</head>
+<body>
+
+  <nav class="topbar">
+    <div class="wrap">
+      <a class="back" href="../index.html">← 返回主页</a>
+      <span class="crumb">论文导读 · 2024</span>
+    </div>
+  </nav>
+
+  <article class="paper">
+    <div class="wrap">
+      <span class="kicker">期刊论文 · 大范围场景三维重建</span>
+      <h1>SuperNeRF：面向大范围场景的高精度三维重建方法</h1>
+      <p class="orig-title">SuperNeRF: High-Precision 3-D Reconstruction for Large-Scale Scenes</p>
+
+      <ul class="meta">
+        <li><b>作者：</b>Guangyun Zhang*, Chaozhong Xue, <span class="hl">Rongting Zhang</span></li>
+        <li><b>发表：</b>IEEE Transactions on Geoscience and Remote Sensing, 2024, 62: 5635313</li>
+        <li><b>类型：</b>SCI 期刊论文（中科院一区 TOP）</li>
+        <li><b>DOI：</b><a href="https://doi.org/10.1109/TGRS.2024.3435743" target="_blank" rel="noopener">10.1109/TGRS.2024.3435743</a></li>
+      </ul>
+
+      <section>
+        <h2>摘要</h2>
+        <p>基于神经辐射场（NeRF）的方法以隐式函数编码体密度与颜色观测，在小尺度场景的三维重建中表现出色；但面对复杂多样的大范围场景时，往往出现纹理模糊、细节缺失等问题。为此，本文提出基于超像素的神经辐射场方法 SuperNeRF：在 NeRF 基础上增加一项利用超像素纹理约束的损失，借助超像素建立空间一致性约束，从而精确提取大范围场景的三维几何与外观。SuperNeRF 能够引导局部相邻且相似的像素形成近乎一致的光线终止分布，并且可与当前先进的 NeRF 类方法兼容。在代表性的航空与航天数据集上开展的综合实验表明，SuperNeRF 在重建精度上显著优于现有先进方法。</p>
+      </section>
+
+      <section>
+        <h2>研究背景与动机</h2>
+        <p>基于二维影像的大范围三维重建是摄影测量与遥感的核心任务，多视几何方法（特征提取与匹配、相机标定、SfM、MVS）是户外大场景重建的主要手段，但传统方法在水面、镜面反射环境下重建效果普遍欠佳，且需要投入大量时间与硬件资源。NeRF 类方法以隐函数隐式编码体密度与颜色，在小场景新视角合成与重建上效果显著；然而受相机模型以及相机与场景距离较远等特性的影响，直接将其用于遥感影像时容易产生纹理模糊、形状细节缺失。城市 NeRF 建模还面临三个固有困难：户外环境无边界、相机位姿缺乏多样性、场景尺度大。更本质的问题在于，二维影像中的像素并非彼此独立，线段与平面所对应的像素之间存在丰富的空间相关性，而 NeRF 训练时每条光线被独立渲染，并未考虑相邻或相似像素所对应光线之间的联系，细微的灰度差异容易引起网络过拟合，在建模出的场景几何中产生明显噪声。SuperNeRF 正是针对这一空白提出的。</p>
+      </section>
+
+      <section>
+        <h2>方法与主要创新</h2>
+        <ul>
+          <li><b>基于超像素的辐射一致性约束（超像素损失）：</b>以原版 NeRF 为骨干，构造 Lsup = Σ(r∈R, r∈P) ‖Ĉ(r) − C̄gt(P)‖²₂。先由 MLP 预测超像素内每个像素所对应光线的密度与颜色分布，经离散化体渲染公式得到各像素颜色 Ĉ(r)，再与该超像素的真值平均颜色 C̄gt(P)（即超像素内像素颜色的均值）求差，使同一超像素内像素的颜色收敛到一致值，抑制离群点与几何噪声。</li>
+          <li><b>保留逐像素颜色损失并组合为总损失：</b>为保持超像素内部像素之间的差异，保留 NeRF 原有的 Lrgb = Σ(r∈R) ‖Ĉ(r) − Cgt(r)‖²₂，总损失为 L = Lrgb + λLsup，文中 λ 经验取值为 1。Lrgb 是主项，辐射一致性约束 Lsup 作为补充项；该损失不需要额外标注或假设，可直接嵌入其他 NeRF 类方法。</li>
+          <li><b>网络结构：</b>由密度网络与辐射网络两部分组成，前者输出空间点被占据程度的标量，后者输出 RGB 颜色。位置输入经 8 个 256 通道全连接 ReLU 层后，再经一层输出体密度与一个 256 维特征向量；该特征与视线方向拼接后经 128 通道全连接 ReLU 层，最后一层以 sigmoid 激活输出颜色。</li>
+          <li><b>生成显式三维表达：</b>用与颜色积分相同的形式计算光线深度 d(r) = Σ Ti(1 − exp(σiδi))ti，得到渲染视角下所有像素的深度图；将像素颜色与深度放入三维空间即得到点云，再结合真实地理坐标可映射为数字表面模型（DSM）。</li>
+          <li><b>超像素提取与尺度分析：</b>超像素由 eCognition Developer 中的多分辨率分割生成，形状参数设为 0.1、紧致度 0.5、尺度 15；文中进一步在 5–35 范围内分四档分析分割尺度的影响，发现尺度为 15 时 MAE 最低——尺度过小会使分割过于破碎、超像素数据加载耗时增加且约束效果减弱，尺度过大则单个超像素覆盖过多语义信息、约束作用被削弱。</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>实验与结果</h2>
+        <p>实验使用四个数据集：DFC2019（Maxar WorldView-3 影像，含 JAX_068 与 JAX_214 区域，约 0.3 m/像素，配 LiDAR 生成的 DSM 真值）、UseGeo（撒丁岛无人机正射影像 829 幅，0.1 m/像素，含真值深度图，本文用航线 1 的 40 幅与航线 2 的 168 幅）、西安航天城中心湖公园（CLP）自采数据（DJI Phantom 4，航高 120 m，118 幅影像）以及 Mip-NeRF 360 基准的 kitchen 与 garden 场景。指标为 PSNR、SSIM、LPIPS，几何精度用 DFC2019 的平均高程绝对误差 MAE 与 UseGeo 的深度均方误差 DMSE。</p>
+        <p>与 NeRF 相比，航线 1 上 SuperNeRF 各项指标最优，PSNR 平均提升 0.45、DMSE 平均降低 0.95；与 Mega-NeRF 相比，航线 2 上 PSNR、SSIM 平均提升 0.25 与 0.007，DMSE 平均降低 0.85；完整 UseGeo 数据集上相对 Block-NeRF，PSNR、SSIM 平均提升 0.4 与 0.005，DMSE 平均降低 1.2。DFC2019 上相对 Sat-NeRF，PSNR 与 SSIM 平均提升 0.63 与 0.007，JAX_068、JAX_214 区域的 MAE 分别低 0.07 m 与 0.2 m；Mip-NeRF 360 上 PSNR 平均提升 0.45，SSIM 基本持平。与传统 MVS 方法（COLMAP、OpenMVS）相比，SuperNeRF 在湖面等低纹理区域也能生成较完整的细节，但场景边缘存在伪影；引入超像素损失后，每个 epoch 或每万次迭代训练时间通常增加 1–3 min。</p>
+      </section>
+
+      <section>
+        <h2>结论与意义</h2>
+        <p>本文提出 SuperNeRF，通过超像素纹理约束来优化 NeRF 的训练过程：在 NeRF 上引入超像素损失，引导相邻且相似的像素收敛到近乎一致的颜色与深度预测，使重建出的几何结构更清晰、更规整。其价值首先在于通用与易用——超像素辐射一致性约束不依赖额外标注或复杂预处理，可作为附加优化项嵌入已有 NeRF 类方法，且不改变其模型规模。文中也指出了局限：SuperNeRF 需要额外时间加载超像素分割数据，影像数量或单幅影像的超像素数量增加会提高 CPU 资源与时间需求；对树木、草坪、水面等具有统计纹理特征的地物，实现优异的三维重建仍具挑战，这既是当前方法的短板，也指明了后续工作的方向。</p>
+      </section>
+
+      <section class="takeaway">
+        <h2>一句话总结</h2>
+        <p>给 NeRF 加超像素辐射一致性损失，大范围场景重建精度与几何规整度显著提升。</p>
+      </section>
+
+      <section class="cite">
+        <h2>引用格式</h2>
+        <p class="code">Zhang, G.; Xue, C.; Zhang, R. SuperNeRF: High-Precision 3-D Reconstruction for Large-Scale Scenes[J]. IEEE Transactions on Geoscience and Remote Sensing, 2024, 62: 5635313. DOI: 10.1109/TGRS.2024.3435743.</p>
+      </section>
+
+      <div class="actions">
+        <a class="btn" href="https://ieeexplore.ieee.org/document/10623670" target="_blank" rel="noopener">查看原文</a>
+        <a class="btn outline" href="../index.html#publications">返回论文列表</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="foot">
+    <p>© 张荣庭 (Rongting Zhang) · 南京工业大学测绘科学与技术学院</p>
+  </footer>
+
+</body>
+</html>

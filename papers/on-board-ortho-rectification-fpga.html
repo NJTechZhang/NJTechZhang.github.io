@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>基于 FPGA 的星上影像正射纠正方法 | 论文导读 - 张荣庭</title>
+  <meta name="description" content="用 FPGA 实现星上遥感影像正射纠正：三模块流水架构，精度约 1–2 m，速度约为 PC 平台的 4.3 倍。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+  <link rel="stylesheet" href="../assets/css/paper.css">
+</head>
+<body>
+
+  <nav class="topbar">
+    <div class="wrap">
+      <a class="back" href="../index.html">← 返回主页</a>
+      <span class="crumb">论文导读 · 2017</span>
+    </div>
+  </nav>
+
+  <article class="paper">
+    <div class="wrap">
+      <span class="kicker">期刊论文 · 星上实时摄影测量处理</span>
+      <h1>基于 FPGA 的星上影像正射纠正方法</h1>
+      <p class="orig-title">On-Board Ortho-Rectification for Images Based on an FPGA</p>
+
+      <ul class="meta">
+        <li><b>作者：</b>Guoqing Zhou, <span class="hl">Rongting Zhang</span>*, Na Liu, Jingjin Huang, Xiang Zhou</li>
+        <li><b>发表：</b>Remote Sensing (MDPI), 2017, 9(9): 874</li>
+        <li><b>类型：</b>SCI 期刊论文</li>
+        <li><b>DOI：</b><a href="https://doi.org/10.3390/rs9090874" target="_blank" rel="noopener">10.3390/rs9090874</a></li>
+      </ul>
+
+      <section>
+        <h2>摘要</h2>
+        <p>传统遥感影像正射纠正在地面个人计算机（PC）平台上完成，难以满足灾害应急等任务对时效性乃至准实时性的要求。为此，本文研究基于现场可编程门阵列（FPGA）的正射纠正技术，可在星上完成（准）实时处理。所提平台由三个模块组成：内存（输入数据）模块、坐标变换模块（含大地坐标到像片坐标、像片坐标到扫描坐标两次变换）和插值模块，其中坐标变换基于共线条件方程以反解法实现，灰度重采样采用双线性插值。论文用丹佛市中心区航空影像与 ERDAS IMAGINE 9.2 示例数据验证速度与精度：FPGA 平台吞吐量 11 182.3 千像素/秒，PC 平台 2582.9 千像素/秒，前者约为后者的 4.3 倍；平面坐标 X、Y 及距离的均方根误差 φX、φY、φS 分别为 1.09 m、1.61 m 与 1.93 m，可满足实际正射纠正的精度要求。</p>
+      </section>
+
+      <section>
+        <h2>研究背景与动机</h2>
+        <p>随着遥感影像获取越来越便捷，影像处理速度却受处理技术限制而难以同步跟进。传统做法是把获取的影像传回地面处理中心再进行镶嵌、融合、正射纠正等处理，而 ENVI、ERDAS IMAGINE 等传统系统多是在 PC 上运行的串行指令系统，处理效率难以满足时间紧迫型灾害响应的需求，大量影像资源因此得不到充分利用。已有的硬件加速研究主要面向视频图像的实时纠正、立体像对的实时纠正等场景，针对遥感影像正射纠正的硬件系统研究很少。正射纠正模型一般包括基于共线条件方程的严密纠正模型、有理函数模型以及基于仿射变换的纠正模型；其中共线条件方程适用于多种分辨率的影像，且在轨道参数已知或未知的情况下均可使用。因此，本文将正射纠正算法分解为若干基本图像处理运算，以降低算法复杂度，构建基于 FPGA 的硬件平台，把正射纠正放到星上执行，从而在保证精度的前提下实现（准）实时处理。</p>
+      </section>
+
+      <section>
+        <h2>方法与主要创新</h2>
+        <ul>
+          <li><b>面向星上处理的三模块 FPGA 总体架构：</b>包含内存（输入数据）模块、坐标变换模块和插值模块。原始数据与参数存放在输入数据模块的 RAM 中，在使能信号有效时于同一时钟周期送入坐标变换与插值各模块，形成流水化并行处理。</li>
+          <li><b>坐标变换模块拆分为共线方程变换子模块（CETM）与仿射变换子模块（ATM）：</b>CETM 依据共线条件方程由大地坐标计算像片坐标，ATM 再结合由框标点解算的仿射变换系数把像片坐标换算为扫描坐标。由于 FPGA 硬件只能实现最基本的逻辑运算，论文把复合运算分解为加法器与乘法器的组合，例如用四个加法器和四个乘法器并行计算 Xg、Yg，并借助延迟单元保证各结果在同一时钟周期输出。</li>
+          <li><b>基于状态机的双口 RAM 两行缓存（two-row buffer）：</b>以初始化（IDEL）、全体开始、全体结束、行开始等状态完成初始化与缓存清理，缓存的双口 RAM 数量由邻域行数决定（nRAM = nnb）。为满足双线性插值的 2×2 邻域需求使用两个双口 RAM，并用多路选择器决定写入对象；第二级缓存采用两组首尾相接的循环移位寄存器 Rmn 保存邻域像素，逐拍移位并丢弃过期数据。</li>
+          <li><b>基于双线性插值的灰度重采样：</b>依据扫描坐标从原影像缓存中取 2×2 邻域灰度，按 (1−p)(1−q)、p(1−q)、(1−p)q、pq 的权重加权得到正射影像灰度；高程 Zg 的内插与灰度插值采用相同的计算过程。</li>
+          <li><b>在 Xilinx Artix-7 芯片上完成硬件实现并评估逻辑资源占用：</b>设计工具为 ISE 4.7 与 System Generator，仿真工具为 ModelSim SE10.1a，从寄存器、查找表（LUT）、输入输出块等资源利用率角度论证所选器件能够满足设计需求。</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>实验与结果</h2>
+        <p>硬件平台为 Xilinx AC701 评估套件（Artix-7 XC7A200T），对照 PC 平台用 MATLAB 2015a 在 Intel Core i7-4790 @3.6 GHz、8 GB RAM 上实现同一算法。数据为两个研究区：丹佛市中心区航空影像（17 054 × 17 054 像素，焦距 153.022 mm，航高 1650 m）与 ERDAS IMAGINE 示例数据 ps_napp.img（2294 × 2294）及配套 DEM，每个研究区用 4 个框标点求解仿射变换系数。</p>
+        <p>以 PC 平台正射影像为参考，第一研究区选 90 个检查点：X、Y 坐标差最大值为 1.16 m 与 1.89 m，标准差为 0.14 m 与 0.38 m；平面坐标 X、Y 及距离的均方根误差 φX、φY、φS 分别为 1.09 m、1.61 m 与 1.93 m。误差处于约 1–2 m 量级，作者认为适合编制 1:10 000 至 1:20 000 比例尺专题图；目视检查显示与 PC 结果约有 1 个像素差异。速度方面，FPGA 平台吞吐量 11 182.3 千像素/秒、耗时 26.01 s，PC 平台为 2582.9 千像素/秒、耗时 112.6 s，约快 4.3 倍。资源占用方面，坐标变换模块含 192 个 IBUF、870 个 OBUF 与 78 个 DSP48E，LUT 利用率 27%；双线性插值模块用 129 个 slice、291 个 IO 与 75 779 个 LUT，IO 与 LUT 利用率分别为 72% 与 56%。</p>
+      </section>
+
+      <section>
+        <h2>结论与意义</h2>
+        <p>本文提出一种可在星上执行的正射纠正方法：平台由内存模块、坐标变换模块（大地坐标到像片坐标、像片坐标到扫描坐标）以及基于双线性插值的灰度插值模块构成。以 PC 平台的正射影像为参考、在多个研究区开展的实验表明，该方法的精度可达米级，处理速度约为 PC 平台的 4.3 倍，资源占用情况也说明所选器件满足设计要求。其意义在于为遥感影像的星上（准）实时几何处理提供了可落地的硬件实现路径，适用于灾害应急等对时效性要求高的场景。文中同时指出，FPGA 与 PC 结果之间仍存在差异，可能来自定点运算误差的传播与累积，这也为后续采用更精细的数值方案、并向有理函数模型等其他传感器模型推广留下了空间。</p>
+      </section>
+
+      <section class="takeaway">
+        <h2>一句话总结</h2>
+        <p>用 FPGA 在星上实现正射纠正，精度米级、速度约为 PC 平台的 4.3 倍。</p>
+      </section>
+
+      <section class="cite">
+        <h2>引用格式</h2>
+        <p class="code">Zhou, G.; Zhang, R.; Liu, N.; Huang, J.; Zhou, X. On-Board Ortho-Rectification for Images Based on an FPGA[J]. Remote Sensing, 2017, 9(9): 874. DOI: 10.3390/rs9090874.</p>
+      </section>
+
+      <div class="actions">
+        <a class="btn" href="https://www.mdpi.com/2072-4292/9/9/874" target="_blank" rel="noopener">查看原文</a>
+        <a class="btn outline" href="../index.html#publications">返回论文列表</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="foot">
+    <p>© 张荣庭 (Rongting Zhang) · 南京工业大学测绘科学与技术学院</p>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MFSM-Net：面向城市尺度纹理三维网格语义分割的多模态特征融合网络 | 论文导读 - 张荣庭</title>
+  <meta name="description" content="受双目感知启发融合俯视正交纹理影像与三维几何特征，用 Bridge 视图实现像素级对齐，SUM 数据集 OA 达 94.0%。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+  <link rel="stylesheet" href="../assets/css/paper.css">
+</head>
+<body>
+
+  <nav class="topbar">
+    <div class="wrap">
+      <a class="back" href="../index.html">← 返回主页</a>
+      <span class="crumb">论文导读 · 2025</span>
+    </div>
+  </nav>
+
+  <article class="paper">
+    <div class="wrap">
+      <span class="kicker">期刊论文 · 城市三维网格语义分割</span>
+      <h1>MFSM-Net：面向城市尺度纹理三维网格语义分割的多模态特征融合网络</h1>
+      <p class="orig-title">MFSM-Net: Multimodal Feature Fusion for the Semantic Segmentation of Urban-Scale Textured 3D Meshes</p>
+
+      <ul class="meta">
+        <li><b>作者：</b>Xinjie Hao, Jiahui Wang, Wei Leng, <span class="hl">Rongting Zhang</span>, Guangyun Zhang*</li>
+        <li><b>发表：</b>Remote Sensing (MDPI), 2025, 17(9): 1573</li>
+        <li><b>类型：</b>SCI 期刊论文</li>
+        <li><b>DOI：</b><a href="https://doi.org/10.3390/rs17091573" target="_blank" rel="noopener">10.3390/rs17091573</a></li>
+      </ul>
+
+      <section>
+        <h2>摘要</h2>
+        <p>纹理三维网格是城市级实景三维模型的重要成果，其优势在于每个三角面片嵌有高分辨率纹理影像，而现有研究多聚焦几何结构，对纹理利用有限。受人类双目感知启发，本文提出面向城市尺度纹理三维网格语义分割的多模态特征融合网络 MFSM-Net。三维特征提取分支以面片重心坐标与面法向量为初始特征，经自适应均衡采样、PointNet 邻域聚合和四层堆叠 Transformer 提取多尺度与全局几何特征；二维特征提取分支用 U-Net 从俯视正交视角的城市纹理影像中提取高层纹理特征。为对齐两种模态，论文提出 Bridge 视图对齐算法（Bridge of 2D–3D 跨模态信息融合模块）：将三维网格面片索引编码为唯一 RGB 值渲染出 Bridge 视图，与纹理视图共享同一相机参数，从而把二维影像像素与三维面片建立像素级关联，实现跨模态特征的精确对齐。在 SUM 基准数据集上的实验表明，该方法在城市尺度纹理三维网格语义分割中取得有竞争力的精度，总体精度 OA 达 94.0%、平均交并比 mIoU 达 71.4%，验证了跨模态融合策略的有效性。</p>
+      </section>
+
+      <section>
+        <h2>研究背景与动机</h2>
+        <p>随着摄影测量与激光雷达技术的发展，高质量城市纹理三维网格数据日益易得且成本下降。与带颜色点云相比，纹理三维网格把精细几何结构与高分辨率纹理影像结合在同一成果中，为场景表达提供了丰富的多模态信息，在道路提取、城市规划等应用中展现出明显优势。然而，以纹理三维网格为对象的城市复杂场景语义分割研究仍处于起步阶段。</p>
+        <p>已有网格语义分割方法大致分为三类：一是把网格直接作为输入，其中谱方法依赖图拉普拉斯特征向量、难以跨域泛化，空间方法（如 PicassoNet-II 的 facet2vertex、vertex2facet 卷积与 SubdivNet）又对网格的连通细分结构要求较严；二是把面片重心当作“重心点云”（CoGP cloud）再套用点云网络，其面片特征多为纯几何特征，纹理受阴影、遮挡等噪声影响时精度急剧下降；三是体素化方法，内存与算力开销大且会损失测地信息。此外，把纹理采样点 RGB 直接拼入特征还会造成特征维数膨胀、对噪声敏感、忽略采样点的相对位置关系。上述方法多在小规模、结构简单的数据集上验证且普遍只用几何特征，因此如何在高分辨率纹理与不规则三维结构之间建立可靠对应、实现二者互补，是本文要解决的核心问题。</p>
+      </section>
+
+      <section>
+        <h2>方法与主要创新</h2>
+        <ul>
+          <li><b>三分支多模态融合框架。</b>MFSM-Net 由三条支路构成：二维纹理特征提取分支、多尺度 Transformer 三维几何特征提取分支以及跨模态对齐分支。二维分支以俯视正交视角捕获的 1024 × 1024 三通道高分辨率纹理影像为输入，经 U-Net 输出 1024 × 1024 × 64 的高层二维特征；三维分支以面片重心坐标和法向量为输入，输出每个面片的高维特征矩阵；对齐分支负责把二维特征变换到三维空间。</li>
+          <li><b>自适应均衡采样（Adaptive Balanced Sampling）。</b>针对不同城市区域面片数量差异巨大的问题，以最远点采样（FPS）为基础构造均衡采样系数 δ = (N₀ / N_T)^(1/k)，其中 N₀ 为输入面片数、N_T 为进入 Transformer 后的面片数、采样步数 k = 3，每一步满足 N_{i+1} = N_i / δ。该策略使不同规模输入的采样强度保持一致，避免了“降密度丢细节”或“扩范围投影过稀”的弊端，也避免了传统 Transformer 用填充对齐固定长度带来的高昂开销。每次采样后由 k-NN 分组层与 PointNet 层聚合邻域特征，特征维度翻倍（C_{i+1} = 2C_i）。</li>
+          <li><b>自注意力全局特征提取与双跳连接上采样。</b>初始特征经 MLP 编码到 C₀ = 12 维，随后进入四层堆叠 Transformer 编码器：由可学习矩阵 W_Q、W_K、W_V 生成 Q、K、V，计算自注意力矩阵 SA = softmax(QKᵗ) 并与 V 相乘。模型使用 4 个注意力头，输出特征维 CT = 96，多头输出经拼接与全连接层降维。上采样阶段提出双跳连接模块（Dual Skip Connection Upsampling），采用基于距离的插值与分层传播：若某低分辨率面片元素不存在于高层特征中，则取其在欧氏空间最近三个近邻特征的平均作为插值特征，再与原特征沿特征维拼接并经 MLP 融合，从而在恢复面片原分辨率的同时保留高层语义，缓解小尺寸目标在多次降采样中被“稀释”的问题。</li>
+          <li><b>Bridge 视图跨模态对齐算法。</b>这是本文的核心创新。由于 SUM 数据集中网格形状多样、尺度差异大且非水密，用相机内外参计算二维像素与面片的对应关系既复杂又昂贵。作者设计了一组公式（原文以取整与取模运算给出），把每个面片的唯一索引 idx 编码为唯一 RGB 值：R = ⌊idx / 255²⌋，G = ⌊(idx mod 255²) / 255⌋，B = idx mod 255，从而为每个面片生成专属颜色，再用与纹理视图完全相同的相机位姿渲染得到 Bridge 视图。对纹理视图中的任一像素 p，在 Bridge 视图同一位置解码 RGB 即可反查其所属面片索引，从而建立像素级对应；该过程纯属推理且借助渲染管线，天然处理遮挡关系。对同一面片的多个像素，按自上而下顺序排序并取中间像素的特征作为该面片的二维特征，最终把二维特征并入三维空间形成语义更丰富的多模态特征。</li>
+          <li><b>多模态输入配置的系统对比。</b>论文设计了四种配置：cf.1 仅用 XYZ 坐标与面法向量（6 维）；cf.2 在几何基础上加入面片纹理采样点的 27 个 RGB 值（27 × RGB + XYZ + Nv，共 81 维），只用三维分支；cf.3 与 cf.4 同时使用二维纹理视图（分别为透视投影与正交投影）与三维几何特征并做特征融合。输入方面，每个 250 m × 250 m 城市场景按 X、Y 方向中位数切分为四块，以在同尺寸下提高正交视图分辨率并降低三维分支的输入规模。</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>实验与结果</h2>
+        <p>实验采用语义城市网格基准数据集 SUM：覆盖芬兰赫尔辛基约 4 km²，含地面、植被、建筑物、水体、车辆、船只 6 类，由倾斜航空影像经 ContextCapture 生成，地面采样距离 7.5 cm。数据分 64 个区块，其中 40 个用于训练、12 个用于验证；三维网格面片样本总量 14 827 376 个（训练 11 201 466 个、测试 3 625 910 个）。训练集与验证集的类别比例高度不均衡：地面（16.85%、17.02%）、高植被（24.17%、23.16%）、建筑物（53.64%、55.91%）、水体（2.49%、1.48%）、车辆（2.02%、2.17%）、船只（0.83%、0.25%）。评价指标包括逐类 IoU、总体精度 OA、平均精度 mAcc、平均交并比 mIoU 与平均 F1。</p>
+        <p>与 PointNet、PointNet++、SPG、RandLA-Net、KPConv、DGCNN 以及 Point Transformer（PT）等先进方法相比，MFSM-Net 在全部指标上最优：逐类 IoU 为地面 79.6%、高植被 89.0%、建筑物 94.1%、水体 83.3%、车辆 51.3%、船只 30.1%，OA 94.0%、mAcc 81.5%、mIoU 71.4%、mF1 79.7%。其中几何建模能力较强的 KPConv 是最具竞争力的基线，OA 为 93.3%、mAcc 73.3%、mIoU 68.8%、mF1 76.7%，本文方法在 mIoU、mAcc、mF1 上分别领先 2.6%、8.2% 和 3.0%；论文同时指出相对全部对比方法的提升最大可达 mAcc 13.2%、mIoU 2.6%、mF1 13.7%，并强调 OA 在类别不均衡数据上会被建筑物、植被等主导类别掩盖，因此需结合平均类指标评价。</p>
+        <p>消融实验进一步显示多模态特征的关键作用：仅用几何输入（cf.1）时 OA 为 85.5%，但 mIoU 与 mAcc 分别只有 45.2% 和 60.1%；把纹理采样点 RGB 作为二维特征（cf.2）时 OA 升至 92.2%、mIoU 59.4%；改用透视视图（cf.3）时 OA 91.3%、mIoU 62.4%，但透视投影会使平行于视点方向的平面严重畸变、建筑物墙面失真；最终采用俯视正交视图的 cf.4 达到 OA 94.0%、mIoU 71.4%，较 cf.2 提升约 10%。低样本类受益尤为明显：船只 IoU 由 10.2% 升至 30.1%，车辆与船只合并看由 30.4% 升至 51.3%，地面与水体的区分由 50.1% 升至 83.3%。实现细节为 PyTorch v2.1.0、NVIDIA GeForce RTX 3060，批大小 1，学习率 0.001 且每 20 个 epoch 衰减 90%（最低 0.00001），送入 Transformer 的面片数为 4096、k-NN 邻域数为 32。</p>
+      </section>
+
+      <section>
+        <h2>结论与意义</h2>
+        <p>论文表明，尽管纹理三维网格比点云等格式具有更细致的结构与纹理表达，复杂城市场景的纹理网格语义分割研究仍处于早期阶段，充分利用网格面嵌入的高分辨率纹理是提升精度的关键。MFSM-Net 用俯视正交影像把不规则网格的纹理“规则化”，用多尺度 Transformer 提取几何上下文，再用 Bridge 视图以极低代价完成二维与三维的像素级对齐，在类别极不均衡的城市尺度数据上取得 OA 94.0%、mIoU 71.4% 的精度。</p>
+        <p>论文也指出局限：投影无法保证每个面片至少被一个像素覆盖，未被纹理视图捕获的面片只能依赖几何特征；此外 SUM 为虚拟场景，高植被、车辆、船只等复杂地物在建模中存在结构变形，会影响泛化性。后续方向包括从更多虚拟视角生成纹理影像以提高网格覆盖率、把二维与三维特征联合嵌入统一网络，以及用真实遥感影像替代合成纹理视图。</p>
+      </section>
+
+      <section class="takeaway">
+        <h2>一句话总结</h2>
+        <p>借助 Bridge 视图对齐二维纹理与三维几何，城市网格分割 OA 达 94.0%。</p>
+      </section>
+
+      <section class="cite">
+        <h2>引用格式</h2>
+        <p class="code">Hao, X.; Wang, J.; Leng, W.; Zhang, R.; Zhang, G. MFSM-Net: Multimodal Feature Fusion for the Semantic Segmentation of Urban-Scale Textured 3D Meshes[J]. Remote Sensing, 2025, 17(9): 1573. DOI: 10.3390/rs17091573.</p>
+      </section>
+
+      <div class="actions">
+        <a class="btn" href="https://www.mdpi.com/2072-4292/17/9/1573" target="_blank" rel="noopener">查看原文</a>
+        <a class="btn outline" href="../index.html#publications">返回论文列表</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="foot">
+    <p>© 张荣庭 (Rongting Zhang) · 南京工业大学测绘科学与技术学院</p>
+  </footer>
+
+</body>
+</html>

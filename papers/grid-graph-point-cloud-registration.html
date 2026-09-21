@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>基于网格图的大规模点云配准方法 | 论文导读 - 张荣庭</title>
+  <meta name="description" content="提出网格图配准算法 GGR，用网格投票与图匹配在极高外点率下稳健配准大规模点云，WHU-TLS 召回率 59.6%。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+  <link rel="stylesheet" href="../assets/css/paper.css">
+</head>
+<body>
+
+  <nav class="topbar">
+    <div class="wrap">
+      <a class="back" href="../index.html">← 返回主页</a>
+      <span class="crumb">论文导读 · 2023</span>
+    </div>
+  </nav>
+
+  <article class="paper">
+    <div class="wrap">
+      <span class="kicker">期刊论文 · 大规模点云配准</span>
+      <h1>基于网格图的大规模点云配准方法</h1>
+      <p class="orig-title">Grid graph-based large-scale point clouds registration</p>
+
+      <ul class="meta">
+        <li><b>作者：</b>Yi Han, Guangyun Zhang*, <span class="hl">Rongting Zhang</span>（原文标注 Yi Han 与 Guangyun Zhang 为共同第一作者）</li>
+        <li><b>发表：</b>International Journal of Digital Earth, 2023, 16(1): 2448–2466</li>
+        <li><b>类型：</b>SCI 期刊论文</li>
+        <li><b>DOI：</b><a href="https://doi.org/10.1080/17538947.2023.2228298" target="_blank" rel="noopener">10.1080/17538947.2023.2228298</a></li>
+      </ul>
+
+      <section>
+        <h2>摘要</h2>
+        <p>无序点云的自动配准是城市三维重建的前提，但现有技术仍存在两方面局限：一方面，多数方法对噪声与重复结构敏感，难以胜任大规模点云的配准；另一方面，多数方法只能处理重叠有限、初始位置不可预测的点云，使户外点云难以获得合格的配准结果。为克服这些局限，本文提出基于网格图的点云配准算法（GGR），用于成对扫描的对齐。首先把点云划分为一组三维网格；提出一种投票策略，基于特征描述子度量两个网格之间的相似度，把表层的点对应关系转化为三维网格表达；随后以图匹配从候选对应中捕获空间一致性，并由图匹配逐层细化对应的网格，直至获得点到点对应关系；最后通过随机采样策略选取对应关系并估计变换参数。在 WHU-TLS、ETH 与 iQmulus 等公开数据集上的综合实验表明，GGR 在配准成功率、旋转误差与平移误差方面均取得良好表现，并优于当前最先进的方法。</p>
+      </section>
+
+      <section>
+        <h2>研究背景与动机</h2>
+        <p>点云广泛用于三维建模、三维模型重建等应用，但扫描仪的视场有限，必须从不同角度进行多次扫描；这些来自不同视角、缺乏地理参考信息的点云要先对齐，才能构成大范围城市场景，因此配准是点云进一步使用前不可或缺的操作。该任务面临多重挑战：数据量大（百万级点）、噪声与重复/对称结构普遍、重叠范围有限、初始位置未知。已有方法大致分为两类。基于特征的方法（FPFH、SHOT 等手工描述子，以及 3DMatch 等学习型描述子）通过比较特征表示建立对应，但在复杂户外场景中虚警率很高——文中示例中经典方法得到的对应关系里 92.3% 为外点、仅 7.7% 为内点（内点 875 个、外点 10534 个）。基于点的方法（ICP 及其变体、Go-ICP、4PCS/Super4PCS、K-4PCS 等）则依赖良好的初始变换，对部分重叠敏感，在户外数据上常常失败；此外，RANSAC 等外点剔除方法在高外点率下难以在有限迭代内完成配准。作者由此提出：与其依赖精确的外点滤除，不如直接改进匹配环节，在提高内点数量的同时增强高外点率下的鲁棒性，从而减少对外点滤波器的依赖。</p>
+      </section>
+
+      <section>
+        <h2>方法与主要创新</h2>
+        <p>GGR 由对应关系生成、图匹配与层次细化三部分组成，主要创新有以下五点。</p>
+        <ul>
+          <li><b>三维网格生成与基于投票的网格对应提取。</b>把点云 X = {x<sub>i</sub>}、Y = {y<sub>i</sub>} 以同一体素尺寸 l<sub>int</sub> 划分为方形三维网格 V<sup>X</sup>、V<sup>Y</sup>，网格内点数低于给定阈值时不再细分，单点网格即为最小网格。相似度度量采用投票机制：把网格 v<sup>X</sup><sub>i</sub> 看作“社区”、其中每个点 x<sub>i</sub> 是投票者、网格 v<sup>Y</sup><sub>j</sub> 是“票箱”，用快速点特征直方图（FPFH）作为特征描述子，当 y<sub>j</sub> 与 x<sub>i</sub> 的特征 F(y<sub>j</sub>)、F(x<sub>i</sub>) 在特征空间中互为最近邻（或距离小于阈值 t<sub>1</sub>）时，x<sub>i</sub> 为 v<sup>Y</sup><sub>j</sub> 投一票；当票数 V(v<sup>Y</sup><sub>j</sub>) 超过阈值 t<sub>2</sub> 时认为 v<sup>X</sup><sub>i</sub> 的对应有效。为降低对单一描述子的依赖，除票数最高的网格外还额外跟踪 2 个候选对应，形成一对多的候选对应矩阵 C ∈ {0,1}<sup>N<sub>X</sub>×N<sub>Y</sub></sup>，并用网格而非单点表达对应，从而降低一致性搜索的计算复杂度。</li>
+          <li><b>基于空间一致性的图匹配。</b>以网格中心生成两组“会合点” Q = {q<sub>i</sub>}、P = {p<sub>k</sub>}，当 (q<sub>i</sub>, p<sub>i</sub>) 与 (q<sub>j</sub>, p<sub>j</sub>) 的欧氏距离相等时，对应关系具有空间一致性；把 Q、P 表示为无向图 G<sub>1</sub>、G<sub>2</sub>，用互相似度 f(C) 度量对应关系的空间几何一致性，并构造亲和矩阵 W（对角项 s<sub>p</sub> 为对应的一元相似度，非对角项 s<sub>e</sub>(a<sup>1</sup><sub>ij</sub>, a<sup>2</sup><sub>kl</sub>) = max(D − |a<sup>1</sup><sub>ij</sub> − a<sup>2</sup><sub>kl</sub>|, 0) 为两点间距离的成对相似度，其中 a<sup>1</sup><sub>ij</sub> = ‖x<sub>i</sub> − x<sub>j</sub>‖<sub>2</sub>、a<sup>2</sup><sub>kl</sub> = ‖y<sub>k</sub> − y<sub>l</sub>‖<sub>2</sub>），把匹配问题写成 c* = argmax(c<sup>T</sup>Wc) 的连续松弛优化问题求解。</li>
+          <li><b>附加冲突游走阻止（ACWP）与随机游走排序。</b>ACWP 通过把冲突匹配对所对应的亲和矩阵元素置零，删除不兼容节点之间的连边，得到更简洁的关联图 G<sub>s</sub>（例如 q<sub>1</sub> 与 q<sub>2</sub> 分别匹配 p<sub>a</sub> 与 p<sub>b</sub> 时，v<sub>1b</sub>、v<sub>2a</sub> 这类失真节点的出边将被删除）；随后在关联图上用随机游走对节点排序，转移矩阵 P 由子随机矩阵 W/d<sub>max</sub> 与吸收态构成，并以幂迭代求准平稳分布，最后用匈牙利算法（Munkres）把连续解离散化为一一对应关系。</li>
+          <li><b>层次匹配细化模块。</b>由于对应的网格仍然过粗、不足以估计精确的变换参数，论文提出层次匹配模块：把邻域网格聚合（v<sup>Y</sup><sub>i</sub> 与其邻域合并为 ṽ<sup>Y</sup><sub>i</sub>）并对网格间隔减半（ṽl<sup>(n)</sup> = ṽl<sup>(n)</sup> × 0.5），交替执行“对应网格提取—细分”过程，直至网格内点数低于阈值，最后把每个点当作一个网格再次匹配，从而把网格级对应逐层细化为点到点对应。</li>
+          <li><b>配准模块。</b>在几何结构约束下以随机采样生成 3 点样本，用 Procrustes 方法给出 SE(3) 刚体变换的闭式解，求使 3 点几何误差最小的旋转与平移；再统计满足内点阈值 t 的对应数量，认为内点更多的分组即为正确对应，最后用全部存活内点重新计算变换矩阵。文中强调，配准只需 3 对正确对应即可精确估计变换，因此提取“少而准”的对应比单纯追求数量更重要。</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>实验与结果</h2>
+        <p>评价指标沿用 FCGF 的协议：特征匹配召回率（FMR）、旋转误差（RE）、平移误差（TE）与配准召回率（RR，重叠不少于 30% 的片段对当 TE &lt; m<sub>t</sub> 且 RE &lt; m<sub>r</sub> 时判为配准正确）。实验在 WHU-TLS、ETH 与 iQmulus 数据集上开展，对比方法包括 RANSAC、RANSACo（Open3D）、ANN、FGR 与 TEASER。在 WHU-TLS 上使用 0.8 的体素降采样，所有方法统一采用 MATLAB 提供的 FPFH 描述子：GGR 取得最高的配准召回率 59.6%，旋转误差 0.009 rad、平移误差 1.144 m；TEASER 为 46.8%、0.010 rad、1.168 m；FGR 为 27.7%、0.032 rad、3.382 m；ANN 为 21.3%、0.029 rad、2.752 m；RANSACo 为 12.8%、0.040 rad、2.090 m；RANSAC 仅 6.4%，旋转误差超过 0.03 rad、平移误差超过 4 m。ICP 与 4PCS 无法对齐该数据集，故未参与比较。在对应关系提取方面，当外点率超过 98% 时，GGR 的平均 FMR 达 12.6%（最大 68.8%），TEASER 仅 2.5%，ANN 为 7.2%，RANSAC 与 FGR 均为 2.0%。网格配置敏感性实验显示，体素尺寸由 15 变化到 30（步长 5）时旋转与平移误差分别低于 0.06 rad 与 5 m，l<sub>int</sub> = 15 时误差最低、召回最高（约等于点云包围盒长边的 1/30），后续实验取 15。在三种 4DOF 变换噪声（M1 随机 4DOF、M2 小幅平移加绕竖轴小角度旋转、M3 真值变换）下，GGR 的旋转误差约 0.01 rad、平移误差小于 3 m，且在 M1 下召回率为 60%，而 RANSACo、RANSAC 与 TEASER 分别只有 19%、6% 与 44%。在 ETH 与 iQmulus 数据集（体素网格尺寸分别为 3.5 m 与 10 m）上，GGR 在 ETH 上优于 FGR 与 TEASER（旋转误差 0.025 rad、平移误差 0.255 m，TEASER 为 0.065 rad、0.326 m，FGR 为 0.050 rad、0.848 m）；在 iQmulus 上 TEASER 略优（两者旋转误差均为 0.001 rad，平移误差分别为 0.340 m 与 0.341 m）。</p>
+      </section>
+
+      <section>
+        <h2>结论与意义</h2>
+        <p>本文提出一种基于特征的、能够在极高外点率下工作的点云配准算法 GGR。实验表明，网格图匹配技术可以可靠地提取对应点并实现精确配准；同时，直接增强匹配、提高内点数量的思路，比依赖外点滤除更能避免高外点率导致的配准失败。在 WHU-TLS 等基准上，GGR 优于 RANSAC、TEASER 等最先进方法，且对性能较弱的描述子保持稳健，对城市户外 TLS 点云尤为有效；由于不需要点云初始位置的假设，它适合作为多视扫描自动配准的粗配准环节。局限在于投票策略模块对点云的空间变换较为敏感，后续需要研究对空间变换不敏感的网格相似度计算方法以提升实用性；此外方法仍以 FPFH 等描述子为基础，可与学习型描述子结合以进一步扩展适用范围。</p>
+      </section>
+
+      <section class="takeaway">
+        <h2>一句话总结</h2>
+        <p>用网格投票与图匹配在极高外点率下稳健配准大规模点云。</p>
+      </section>
+
+      <section class="cite">
+        <h2>引用格式</h2>
+        <p class="code">Han Y, Zhang G, Zhang R. Grid graph-based large-scale point clouds registration[J]. International Journal of Digital Earth, 2023, 16(1): 2448-2466. DOI: 10.1080/17538947.2023.2228298.</p>
+      </section>
+
+      <div class="actions">
+        <a class="btn" href="https://www.tandfonline.com/doi/full/10.1080/17538947.2023.2228298" target="_blank" rel="noopener">查看原文</a>
+        <a class="btn outline" href="../index.html#publications">返回论文列表</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="foot">
+    <p>© 张荣庭 (Rongting Zhang) · 南京工业大学测绘科学与技术学院</p>
+  </footer>
+
+</body>
+</html>

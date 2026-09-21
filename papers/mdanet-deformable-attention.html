@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>面向高分辨率遥感影像语义分割的可变形注意力网络 | 论文导读 - 张荣庭</title>
+  <meta name="description" content="用可变形卷积重构空间注意力，提出可变形注意力模块 DAM 与多尺度网络 MDANet，在 Vaihingen 与 DeepGlobe 上 mIoU 较 ResNet50 分别提升 7.77% 与 8.45%。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+  <link rel="stylesheet" href="../assets/css/paper.css">
+</head>
+<body>
+
+  <nav class="topbar">
+    <div class="wrap">
+      <a class="back" href="../index.html">← 返回主页</a>
+      <span class="crumb">论文导读 · 2021</span>
+    </div>
+  </nav>
+
+  <article class="paper">
+    <div class="wrap">
+      <span class="kicker">期刊论文 · 遥感影像语义分割</span>
+      <h1>面向高分辨率遥感影像语义分割的可变形注意力网络</h1>
+      <p class="orig-title">A Deformable Attention Network for High-Resolution Remote Sensing Images Semantic Segmentation</p>
+
+      <ul class="meta">
+        <li><b>作者：</b><span class="hl">R. Zuo</span>, G. Zhang, <span class="hl">R. Zhang</span>, X. Jia（左仁祥、张广运、张荣庭、Xiuping Jia）</li>
+        <li><b>发表：</b>IEEE Transactions on Geoscience and Remote Sensing, 2021, 60: 1–14</li>
+        <li><b>类型：</b>SCI 期刊论文（中科院一区 TOP）</li>
+        <li><b>DOI：</b><a href="https://doi.org/10.1109/TGRS.2021.3119537" target="_blank" rel="noopener">10.1109/TGRS.2021.3119537</a></li>
+      </ul>
+
+      <p class="note">说明：本页导读依据论文公开摘要整理（该文为 IEEE 订阅论文，未获取全文 PDF），方法与数据细节以原文为准。</p>
+
+      <section>
+        <h2>摘要</h2>
+        <p>
+          可变形卷积网络（DCN）能够在一定程度上缓解卷积固有的几何变换能力受限问题。本文利用 DCN 重新构建了<strong>空间注意力机制</strong>，用于高分辨率遥感（HRRS）影像的语义分割，形成<strong>可变形注意力模块（DAM）</strong>——它同时具备稀疏空间采样策略与长程关系建模能力。这种局部感知特性更契合 HRRS 影像中地物的结构特点，能够捕获每个像素的邻域结构信息。基于 DAM，作者设计了合理的<strong>多尺度可变形注意力网络（MDANet）</strong>，仅以很小的计算开销增加为代价完成 HRRS 影像语义分割：具体地，将原始 ResNet50 中的标准卷积层配备 DAM，从而在更广范围的特征层级上控制采样并聚合多尺度上下文信息。在 <strong>Vaihingen</strong> 与 <strong>DeepGlobe 土地覆盖分类</strong>数据集上的实验结果表明，MDANet 相较于主干网络 ResNet50，在 <strong>mIoU</strong> 指标上分别<strong>提升 7.77% 与 8.45%</strong>；此外，在 3×64×64 特征图上，DAM 能以更少计算量取得优于全局空间注意力机制的效果。
+        </p>
+      </section>
+
+      <section>
+        <h2>研究背景与动机</h2>
+        <p>
+          语义分割是高分辨率遥感影像解译的核心任务之一。与自然图像相比，遥感影像存在显著的<strong>尺度差异</strong>与<strong>几何形变</strong>：同一类地物在不同成像条件下形态差异大，建筑物、道路等目标具有强烈的规则几何特征，而标准卷积的固定采样网格难以自适应地贴合这些结构。
+        </p>
+        <p>
+          已有的空间注意力机制（如全局自注意力）虽能建模长程依赖，但计算复杂度随特征图尺寸平方增长，且其稠密注意力对局部几何结构并不敏感。本文的动机是：<strong>用可变形卷积的稀疏、可学习采样点来重构注意力</strong>，使注意力既能"看得远"、又能"抓得准"，从而在遥感影像上以更低成本获得更贴合地物结构的特征表达。
+        </p>
+      </section>
+
+      <section>
+        <h2>方法与主要创新</h2>
+        <ul>
+          <li><strong>可变形注意力模块（DAM）</strong>：用可变形卷积重构空间注意力，把稀疏空间采样与长程关系建模结合，具备更强的局部结构感知能力。</li>
+          <li><strong>多尺度可变形注意力网络（MDANet）</strong>：在 ResNet50 主干的标准卷积层中嵌入 DAM，使网络能在更广的特征层级上控制采样、聚合多尺度上下文。</li>
+          <li><strong>低开销设计</strong>：相比原始主干网络仅带来很小的计算量增加，在 3×64×64 特征图上 DAM 的表现优于全局空间注意力且计算更省。</li>
+          <li><strong>消融与超参数分析</strong>：通过消融实验分别验证 DAM 与多尺度策略的有效性与效率，并分析了关键超参数的敏感性。</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>实验与结果</h2>
+        <p>
+          论文在两个公开数据集上评估方法：<strong>Vaihingen</strong>（ISPRS 高分辨率航空影像语义标注数据集）与 <strong>DeepGlobe 土地覆盖分类数据集</strong>。评价指标为 <strong>mIoU</strong>。结果显示，MDANet 相比主干网络 ResNet50 分别提升 <strong>7.77%</strong>（Vaihingen）与 <strong>8.45%</strong>（DeepGlobe）；同时，在 3×64×64 的特征图上，DAM 的计算量低于全局空间注意力且精度更高，说明稀疏可变形采样的效率优势。论文还通过消融实验验证了 DAM 与多尺度策略各自的贡献。
+        </p>
+        <p>
+          由于该文为订阅制论文，本导读未能获取原文中逐类别的精度数值与完整对比表格，建议查阅原文获取更详细的定量结果。
+        </p>
+      </section>
+
+      <section>
+        <h2>结论与意义</h2>
+        <p>
+          该工作提出的可变形注意力范式，为高分辨率遥感影像语义分割提供了一条"以稀疏采样替代稠密注意力"的高效技术路线，在精度与计算成本之间取得了良好平衡。其思想后续被作者团队进一步发展应用于道路提取（RADANet）等任务，具有较好的延续性与推广价值，可服务于土地利用调查、城市精细化管理与遥感智能解译等应用。
+        </p>
+      </section>
+
+      <section class="takeaway">
+        <h2>一句话总结</h2>
+        <p>把可变形卷积嵌入空间注意力，用稀疏自适应采样替代稠密注意力，mIoU 较 ResNet50 最高提升 8.45%。</p>
+      </section>
+
+      <section class="cite">
+        <h2>引用格式</h2>
+        <p class="code">R. Zuo, G. Zhang, R. Zhang, and X. Jia, "A Deformable Attention Network for High-Resolution Remote Sensing Images Semantic Segmentation," IEEE Transactions on Geoscience and Remote Sensing, vol. 60, pp. 1–14, 2021, doi: 10.1109/TGRS.2021.3119537.</p>
+      </section>
+
+      <div class="actions">
+        <a class="btn" href="https://ieeexplore.ieee.org/document/9568862/" target="_blank" rel="noopener">查看原文</a>
+        <a class="btn outline" href="../index.html#publications">返回论文列表</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="foot">
+    <p>© 张荣庭 (Rongting Zhang) · 南京工业大学测绘科学与技术学院</p>
+  </footer>
+
+</body>
+</html>

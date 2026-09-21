@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>通用缓冲区生成算法 | 论文导读 - 张荣庭</title>
+  <meta name="description" content="提出通用缓冲区生成算法 GBA，让缓冲半径随邻近实例的几何距离与属性特征变化，并用六项指标与两组城市数据验证。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+  <link rel="stylesheet" href="../assets/css/paper.css">
+</head>
+<body>
+
+  <nav class="topbar">
+    <div class="wrap">
+      <a class="back" href="../index.html">← 返回主页</a>
+      <span class="crumb">论文导读 · 2021</span>
+    </div>
+  </nav>
+
+  <article class="paper">
+    <div class="wrap">
+      <span class="kicker">期刊论文 · GIS 空间缓冲区分析</span>
+      <h1>通用缓冲区生成算法</h1>
+      <p class="orig-title">Generalized Buffering Algorithm</p>
+
+      <ul class="meta">
+        <li><b>作者：</b>Guoqing Zhou, <span class="hl">Rongting Zhang</span>*, Shengxin Huang</li>
+        <li><b>发表：</b>IEEE Access, 2021, 9: 27140–27157</li>
+        <li><b>类型：</b>SCI 期刊论文</li>
+        <li><b>DOI：</b><a href="https://doi.org/10.1109/ACCESS.2021.3057719" target="_blank" rel="noopener">10.1109/ACCESS.2021.3057719</a></li>
+      </ul>
+
+      <section>
+        <h2>摘要</h2>
+        <p>缓冲区分析是地理信息系统（GIS）空间分析的基础算子，但过去 60 年间提出的众多缓冲区算法大多基于固定的缓冲距离，未考虑缓冲区内邻近实例的属性特征，难以满足实际应用对高精度的需求：生成的缓冲区往往偏离“真实”缓冲区，既产生无用区域，也丢失有用区域。为此，本文提出通用缓冲区生成算法（GBA），同时顾及缓冲区内所有实例的几何距离与属性特征。算法包含三个主要步骤：(1) 选择并初始化目标实例；(2) 通过挖掘同质模式确定缓冲区边界点；(3) 将缓冲区边界点“平滑”连接，生成通用缓冲区。文中分别讨论了通用点缓冲区（GPIB）、通用线缓冲区（GLB）与通用面缓冲区（GPLB）的生成细节，并用两组数据集、六个参数作为指标验证算法性能。实验结果表明：当 GPIB 的角度增量 Δφ、GLB 的线增量 ΔL、GPLB 的弧长增量 ΔS 分别趋近于零时，GBA 与传统缓冲区算法（TBA）趋于一致；GBA 能更准确地反映缓冲区的真实情况，改进了传统缓冲区算法在实际应用中的不足与精度缺陷。</p>
+      </section>
+
+      <section>
+        <h2>研究背景与动机</h2>
+        <p>缓冲区算法的研究可追溯到 20 世纪 60 年代，当时欧洲首次把统计学引入地理学；传统缓冲区算法包括点要素、线要素与面要素三类缓冲。此后 60 余年间出现了大量新算法，如借助 Douglas-Peucker 算法加速缓冲区概化、顾及约束的不规则缓冲区生成、矢量—栅格混合的线缓冲生成、基于 MPI 与区域合并的并行缓冲、三维数字地球中的快速缓冲分析以及基于瓦片的大地缓冲生成等，但这些改进大多仍沿用“固定缓冲距离”的基本假设，生成形状规则的圆形或平行带。问题在于：现实中许多地理过程（如噪声传播）受邻近地物（建筑物、道路等）属性的影响，各方向上的传播距离并不相等，固定距离缓冲区因此与实际情况发生偏差，缓冲区形状“不真实”、精度偏低，既出现无用区域，又丢失有用区域。以噪声污染为例，通常 80 dB 以上被视为噪声，45–60 dB 以下则不计入城市环境噪声，声压级随距离平方按对数规律衰减，而建筑物的综合面密度（IAD）会阻碍声音传播——这些信息都无法被固定半径的圆形缓冲区表达。因此，需要一种缓冲半径随邻近实例属性变化的算法，以真实反映缓冲区范围。</p>
+      </section>
+
+      <section>
+        <h2>方法与主要创新</h2>
+        <p>GBA 的核心思想是用同质规则诱导缓冲区生成，使缓冲半径随实例属性变化，从而得到非规则形状的缓冲区，主要创新有以下五点。</p>
+        <ul>
+          <li><b>GBA 的数学模型与总体流程。</b>缓冲半径不再是常数，而由同质规则 CLR 约束：r<sub>CL</sub> = d[(x, y), CLR]，通用缓冲区为满足 d(p, A<sub>j</sub>) ≤ r<sub>CL</sub> 的实例集合 CL_B<sub>j</sub>。算法分三步实施：先建立极坐标系并初始化目标实例（点要素以自身为极点，线或面要素以线上、多边形弧上的采样点为极点），再沿方向线 ϕ（0 到 2π）确定缓冲区边界点，最后用插值方法把边界点平滑连接成缓冲区。</li>
+          <li><b>基于 R-邻近关系与同质模式挖掘的边界点判定。</b>先把任意两实例 p<sub>i</sub>、p<sub>i+1</sub> 的欧氏距离 Ed(p<sub>i</sub>, p<sub>i+1</sub>) 与距离阈值 E<sub>θ</sub> 比较，得到 R-邻近关系 R(p<sub>i</sub>, p<sub>i+1</sub>)（距离不大于阈值时取 1）；再用新定义的参与度指数 NPI(p<sub>i</sub>, p<sub>i+1</sub>) = similar_nA(p<sub>i</sub>, p<sub>i+1</sub>) / total_nA（两实例取值相同的属性个数 / 参与计算的属性总数）判断同质性，NPI 不小于阈值 NPI<sub>θ</sub> 即视为同质；进而由 k−1 阶与 k−2 阶同质模式逐级生成“频繁同质模式”，在方向 ϕ 上沿径向以距离步长 Δd 探测，最远且满足同质规则的实例即被判为该方向的缓冲边界点。</li>
+          <li><b>三类通用缓冲区算法。</b>通用点缓冲区（GPIB）以目标点为极点、以 Δφ 为角度增量旋转探测，把满足属性同质规则的近邻聚集进缓冲区；通用线缓冲区（GLB）把目标线离散为采样点集 {A<sub>0</sub>, A<sub>1</sub>, …, A<sub>m</sub>} 并作为轴线，逐点在法线方向按同质规则确定变化缓冲距离 r<sub>Aj</sub> = D[BP<sub>Aj</sub>(x<sub>b</sub>, y<sub>b</sub>), CLR<sub>Aj</sub>]，面积按 LS = ∫<sub>Li</sub> ds ∫<sub>0</sub><sup>r<sub>Aj</sub></sup> dr + S<sub>A0</sub> + S<sub>Am</sub> 计算，并用三次样条插值连接边界点；通用面缓冲区（GPLB）以多边形边界线为轴，先按步长采集边界点、以相邻三点到中间点直线的距离判定共线性与拐点，再沿法线方向挖掘 2 阶、k 阶同质模式，把满足同质规则且沿法线方向离采样点最远的点作为边界点。</li>
+          <li><b>以噪声污染为验证范式。</b>两类数据集中的点位噪声源假定为原位施工（开挖、爆破、水泥搅拌等），线噪声源假定为公路上行驶的车辆，面噪声源假定为持续运转的工厂机械，周边建筑物则作为阻碍噪声传播的邻近实例；按 ΔdB = 10 lg(1/4πr²) 的衰减模型与 80 dB 声源、45 dB 阈值，得到传统点缓冲半径为 63.5 m（距离步长取 Δd = 12.7 m）。为便于检验，仅选取“综合面密度（IAD）”这一属性参与 NPI 计算，算例中 NPI<sub>θ</sub> 取 2/3。</li>
+          <li><b>六参数定量评价体系。</b>为把 GBA 与传统点/线/面缓冲区算法（TPB、TLB、TPLB）进行定量比较，本文采用六个指标：面积差 ΔArea = Area<sub>T</sub> − Area<sub>Gi</sub>、周长差 ΔPerimeter = Perimeter<sub>T</sub> − Perimeter<sub>Gi</sub>、相对位置相似度 D(|a, b|) = 1/(1 + |a, b|<sup>2</sup>)（|a, b| 为两个缓冲区质心之间的距离）、相对面积相似度 S<sub>area</sub> = 1 − |S<sub>T</sub> − S<sub>G</sub>| / max(S<sub>T</sub>, S<sub>G</sub>)、相对周长相似度 S<sub>per</sub> = 1 − |P<sub>T</sub> − P<sub>G</sub>| / max(P<sub>T</sub>, P<sub>G</sub>) 以及质心偏移量 Δf = √(ΔX<sup>2</sup> + ΔY<sup>2</sup>)。</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>实验与结果</h2>
+        <p>实验使用两组中国城市的电子矢量数据（ArcGIS shp 格式，均取自地理信息监测云平台，信息量超过 3000 万条）：Dataset-1 为 2015 年深圳市宝安区数据，含 24 类点要素共 1876 个点元素、11 类线要素共 26135 个线元素、7 类面要素共 1201 个面元素；Dataset-2 为 2015 年北京市数据，含 18 类点要素共 124252 个点元素、9 类线要素共 112057 个线元素、4 类面要素共 6933 个面元素。实验在 Intel Xeon E5645 六核 2.4 GHz、4 GB 内存的计算机上完成，评价指标为上述六个参数。结果表明：随角度增量 Δφ 由 1.5° 增大到 9°，GPIB 相对传统点缓冲的面积差达 1.6 至 3.9 倍（Dataset-1）和 1.8 至 2.5 倍（Dataset-2），相对位置相似度由 41.4% 降到 26.3%（Dataset-1）、由 2.8% 降到 1.9%（Dataset-2），相对面积相似度由 97.7% 降到 91.2%（Dataset-1）、由 68.9% 降到 23.1%（Dataset-2），质心偏移为 1.4 至 2.8 m（Dataset-1）和 34.1 至 52.6 m（Dataset-2）。随线增量 ΔL 由 1 m 增大到 15 m，GLB 的面积差为 1.6 至 3.3 倍（Dataset-1）和 1.5 至 3 倍（Dataset-2），相对位置相似度由 53.7% 降到 33.8%（Dataset-1）、由 10.6% 降到 3.7%（Dataset-2），质心偏移为 0.9 至 2.1 m 与 8.5 至 26.1 m。随弧长增量 ΔS 由 1 m 增大到 15 m，GPLB 的面积差为 1.7 至 3.3 倍（Dataset-1）和 1.2 至 4.4 倍（Dataset-2），质心偏移为 17.3 至 17.5 m 与 1.4 至 2.0 m。总体规律是：增量趋近于 0 时 GBA 与传统算法趋于一致；增量增大时相对位置相似度与相对面积相似度下降、周长增大，且数据密度越小，相对位置相似度的变化越明显。</p>
+      </section>
+
+      <section>
+        <h2>结论与意义</h2>
+        <p>GBA 是一种“辐射型、突破型”的缓冲生成算法：它同时考虑两个实例的空间数据与非空间属性及其相关性，使缓冲距离随实例特征变化，从而挑战了沿用 60 余年的固定距离传统缓冲算法。用深圳宝安区与北京市的点、线、面数据以及六个指标进行的对比分析表明，GBA 能更准确地反映缓冲区的真实情况，改进了传统缓冲区算法的不足与精度。该方法适用于噪声污染影响范围评估、公共设施选址与服务范围分析、城市空间管制等需要顾及邻近地物属性差异的空间分析场景。后续工作可将属性体系由单一的 IAD 扩展到多属性加权、把同质规则与机器学习方法结合，并针对海量要素优化边界点挖掘的效率。</p>
+      </section>
+
+      <section class="takeaway">
+        <h2>一句话总结</h2>
+        <p>让缓冲半径随邻近实例属性变化，突破沿用六十年的固定距离缓冲区算法。</p>
+      </section>
+
+      <section class="cite">
+        <h2>引用格式</h2>
+        <p class="code">Zhou G, Zhang R, Huang S. Generalized Buffering Algorithm[J]. IEEE Access, 2021, 9: 27140-27157. DOI: 10.1109/ACCESS.2021.3057719.</p>
+      </section>
+
+      <div class="actions">
+        <a class="btn" href="https://ieeexplore.ieee.org/document/9352536" target="_blank" rel="noopener">查看原文</a>
+        <a class="btn outline" href="../index.html#publications">返回论文列表</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="foot">
+    <p>© 张荣庭 (Rongting Zhang) · 南京工业大学测绘科学与技术学院</p>
+  </footer>
+
+</body>
+</html>

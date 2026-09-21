@@ -1,0 +1,206 @@
+/* ============================================================
+   论文中文导读页样式（与主页风格一致）
+   ============================================================ */
+
+:root {
+  --primary: #1a4b8c;
+  --primary-dark: #123464;
+  --accent: #2e8b8b;
+  --bg: #f7f9fc;
+  --card-bg: #ffffff;
+  --text: #2c3e50;
+  --text-light: #5d6d7e;
+  --border: #e3e9f0;
+  --radius: 10px;
+  --shadow: 0 2px 10px rgba(26, 75, 140, 0.08);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.85;
+  font-size: 16px;
+}
+
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.wrap { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+
+/* ---------- 顶部导航 ---------- */
+.topbar {
+  position: sticky; top: 0;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  z-index: 10;
+}
+.topbar .wrap {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px; font-size: 0.9rem;
+}
+.topbar .back { font-weight: 600; }
+.crumb { color: var(--text-light); }
+
+/* ---------- 正文卡片 ---------- */
+.paper {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin: 28px auto 40px;
+  padding: 40px 46px 34px;
+  max-width: 900px;
+}
+
+.kicker {
+  display: inline-block;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  background: rgba(46, 139, 139, 0.1);
+  border-radius: 999px;
+  padding: 3px 12px;
+  margin-bottom: 14px;
+}
+
+.paper h1 {
+  font-size: 1.65rem;
+  line-height: 1.45;
+  color: var(--primary-dark);
+  margin-bottom: 10px;
+}
+
+.orig-title {
+  font-size: 0.98rem;
+  color: var(--text-light);
+  font-style: italic;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 18px;
+}
+
+.meta { list-style: none; margin-bottom: 26px; }
+.meta li { font-size: 0.93rem; margin-bottom: 6px; color: var(--text); }
+.meta b { color: var(--primary-dark); }
+.meta .hl { font-weight: 700; color: var(--primary-dark); background: rgba(46,139,139,0.12); padding: 0 4px; border-radius: 3px; }
+
+.paper section { margin-bottom: 26px; }
+.paper h2 {
+  font-size: 1.12rem;
+  color: var(--primary-dark);
+  border-left: 4px solid var(--accent);
+  padding-left: 12px;
+  margin-bottom: 12px;
+}
+.paper p { margin-bottom: 12px; text-align: justify; }
+.paper ul, .paper ol { margin: 0 0 12px 24px; }
+.paper li { margin-bottom: 7px; }
+.paper strong { color: var(--primary-dark); }
+
+/* 提示说明 */
+.note {
+  font-size: 0.86rem;
+  color: var(--text-light);
+  background: #fff8e6;
+  border: 1px solid #f0e0b8;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 24px;
+}
+
+/* 一句话总结 */
+.takeaway {
+  background: linear-gradient(135deg, rgba(26,75,140,0.06), rgba(46,139,139,0.08));
+  border-left: 4px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  padding: 16px 20px;
+}
+.takeaway h2 { border: none; padding-left: 0; margin-bottom: 6px; }
+
+/* 引用格式 */
+.cite .code {
+  background: #f2f5f9;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 0.86rem;
+  line-height: 1.7;
+  word-break: break-word;
+  color: #33475b;
+}
+
+/* 底部按钮 */
+.actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+.btn {
+  display: inline-block;
+  background: var(--primary);
+  color: #fff;
+  padding: 9px 22px;
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(26,75,140,0.25); text-decoration: none; }
+.btn.outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
+.btn.outline:hover { background: rgba(26,75,140,0.07); }
+
+/* ---------- 论文导读总览页 ---------- */
+.idx {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 34px 22px 10px;
+}
+.idx h1 {
+  font-size: 1.7rem;
+  color: var(--primary-dark);
+  margin-bottom: 12px;
+}
+.idx-intro {
+  color: var(--text-light);
+  font-size: 0.95rem;
+  margin-bottom: 26px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.idx-year {
+  font-size: 1.15rem;
+  color: var(--primary-dark);
+  border-left: 4px solid var(--accent);
+  padding-left: 12px;
+  margin: 26px 0 12px;
+}
+.idx-list { list-style: none; }
+.idx-list li {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 13px 18px;
+  margin-bottom: 10px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.idx-list li:hover { transform: translateX(4px); box-shadow: 0 4px 14px rgba(26,75,140,0.14); }
+.idx-title { font-weight: 600; font-size: 1rem; }
+.idx-meta { font-size: 0.86rem; color: var(--text-light); margin-top: 3px; }
+.idx-foot { margin: 30px 0 10px; font-size: 0.9rem; color: var(--text-light); }
+
+/* ---------- 页脚 ---------- */
+.foot {
+  text-align: center;
+  padding: 26px 0 40px;
+  color: var(--text-light);
+  font-size: 0.85rem;
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 720px) {
+  .paper { padding: 26px 20px 22px; margin: 16px 12px 28px; }
+  .paper h1 { font-size: 1.32rem; }
+  body { font-size: 15px; }
+}

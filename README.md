@@ -12,25 +12,68 @@
 
 ```
 个人学术主页/
-├── index.html          # 主页（所有内容都在这里）
+├── index.html                  # 主页（个人简介 / 研究方向 / 论文列表 / 联系方式）
+├── papers/                     # 论文中文导读（每篇论文一个页面）
+│   ├── index.html              # 论文导读总览（按年份索引 22 篇）
+│   ├── mesh-based-dgcnn.html   # 例：Mesh-Based DGCNN 导读
+│   └── ...（共 22 篇）
 ├── assets/
-│   ├── css/style.css   # 样式
-│   ├── js/main.js      # 交互脚本（导航、年份等）
-│   └── img/avatar.jpg  # 个人照片（可选，未放置时显示"张"字头像）
-└── README.md           # 本说明
+│   ├── css/style.css           # 主页样式
+│   ├── css/paper.css           # 论文导读页样式
+│   ├── js/main.js              # 交互脚本（导航、年份等）
+│   └── img/avatar.jpg          # 个人照片（可选，未放置时显示"张"字头像）
+├── tools/                      # 维护工具（Python，需 PyMuPDF）
+│   ├── build_digest.py         # 从 PDF 批量提取全文与内容摘要素材
+│   └── check_site.py           # 站点自检：链接、结构、条目一致性
+├── 论文原文/                    # 论文 PDF 原文（已在 .gitignore 中排除，不会上线）
+├── .gitignore                  # 排除 PDF 原文与临时文件
+├── .nojekyll                   # 声明纯静态站点
+└── README.md                   # 本说明
 ```
+
+### 维护工具用法
+
+```bash
+# 站点自检（提交前建议运行）：检查内部链接、页面结构、论文条目是否一致
+python tools/check_site.py
+
+# 新增论文时：从 论文原文/*.pdf 批量提取全文与摘要素材到 .tmp_extract/
+python tools/build_digest.py
+```
+
+两个脚本均需 `pip install pymupdf`。
+
+## 一之二、论文中文导读
+
+「发表论文」列表中，**点击论文标题或「中文导读」标签**即进入该论文的中文导读页。每篇导读包含：
+
+- 摘要（中文完整复述）
+- 研究背景与动机
+- 方法与主要创新（分条说明）
+- 实验与结果（含数据集、对比方法与真实数值）
+- 结论与意义
+- 一句话总结
+- 标准引用格式与原文链接
+
+共 **22 篇**，可在 `papers/index.html`（论文导读总览）中按年份浏览全部导读。
+
+### 新增论文导读的步骤
+
+1. 把论文 PDF 放入 `论文原文/` 目录
+2. 复制任一 `papers/*.html` 作为模板，替换标题、作者、期刊、摘要等各节内容
+3. 在 `index.html` 的「发表论文」章节对应年份下新增条目，并在 `papers/index.html` 中登记
 
 ## 二、修改个人信息
 
-所有内容都在 `index.html` 中，搜索 `TODO` 注释即可找到待补充位置：
+主页内容在 `index.html` 中，搜索 `TODO` 注释即可找到待补充位置：
 
 | 待补充项 | 位置（index.html 内搜索） | 说明 |
 |---|---|---|
 | 职称（讲师/副教授等） | `TODO: 职称确认后替换` | 页头 title-line 处 |
-| 教育背景 / 工作经历 | `TODO: 教育背景、工作经历确认后在此补充` | 个人简介卡片中 |
-| 邮箱 | `TODO: 确认后填写邮箱` | 联系方式卡片中 |
 | 个人照片 | 复制照片为 `assets/img/avatar.jpg` | 建议正方形，约 500×500px |
-| 论文列表 | 「发表论文」章节 | 对照 Google Scholar 核对作者与补充新论文 |
+| 论文列表 | 「发表论文」章节 | 核对作者顺序、补充新论文并链接到导读页 |
+
+联系方式（邮箱 `zrt@njtech.edu.cn`）已按学院公开信息填写。
 
 ## 三、部署到 GitHub Pages（约 5 分钟）
 
@@ -87,8 +130,13 @@ git push
 ## 五、信息核实说明
 
 - 身份与论文信息依据学院主页（https://cge.njtech.edu.cn/info/1045/4427.htm）与 Google Scholar（https://scholar.google.com.hk/citations?user=4arxHdYAAAAJ&hl=zh-CN&oi=ao）整理
-- 论文作者顺序请对照 Google Scholar 最终核实；`index.html` 中已标注 `TODO` 项待您补充
+- 论文中文导读均依据论文 PDF 原文撰写，实验数值取自原文；作者顺序请对照 Google Scholar 最终核实
 - 学院地址为南京工业大学江北校区公共信息，请按实际确认
+- **两篇论文未能获取全文 PDF**（IEEE 订阅论文，无开放获取版本），其导读依据**公开摘要**整理，页面中已明确标注：
+  - *RADANet: Road Augmented Deformable Attention Network for Road Extraction...*（IEEE TGRS 2023）
+  - *A Deformable Attention Network for High-Resolution Remote Sensing Images Semantic Segmentation*（IEEE TGRS 2021）
+  若在校内网络下载到 PDF 并放入 `论文原文/`，可据此补充完善这两篇导读。
+- **版权提示**：`论文原文/` 目录中的 PDF 归各出版商所有，已在 `.gitignore` 中排除，不会随站点上线。若您有把握获得授权并希望公开，删除 `.gitignore` 中对应的 `论文原文/` 一行即可。
 
 ## 六、技术说明
 
