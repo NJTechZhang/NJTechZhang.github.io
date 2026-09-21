@@ -114,6 +114,18 @@ git push -u origin main
 > 推送时需输入 GitHub 用户名与 Personal Access Token（密码框内粘贴）。
 > Token 获取：GitHub 头像 → Settings → Developer settings → Personal access tokens → Generate new token，勾选 `repo` 权限，复制生成的 token。
 
+#### 本机（当前开发环境）推送注意事项
+
+若 `git push` 报 `schannel: AcquireCredentialsHandle failed` 或 `TLS connect error ... unexpected eof`，
+是运行环境的 TLS/HTTP2 限制所致，仓库已在本机 `.git/config` 中设置以下参数（`--local`，不影响其它仓库）：
+
+```bash
+git config --local http.sslBackend openssl   # 改用 OpenSSL 而非 schannel
+git config --local http.version HTTP/1.1     # HTTP/2 在该环境不通
+```
+
+设置后即可正常 `git push`。这两项设置在普通网络环境下同样可正常工作。
+
 ### 第 4 步：启用 Pages 并访问
 
 1. 仓库页面 → **Settings** → 左侧 **Pages**
